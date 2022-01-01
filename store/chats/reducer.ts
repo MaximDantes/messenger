@@ -14,7 +14,7 @@ const initialState = {
 
 const chatsReducer = (state = initialState, action: Action): typeof initialState => {
     switch (action.type) {
-        case 'chats/SET_CHATS':
+        case 'chats/CHATS_RECEIVED':
             return {
                 ...state,
                 chats: action.payload

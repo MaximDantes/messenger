@@ -1,12 +1,15 @@
 import React, {useEffect} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
-import {auth, getUser} from '../store/auth/thunks'
-import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {auth} from '../store/auth/thunks'
+import {Button, View} from 'react-native'
 import {screenStyles} from '../styles/common'
-import {chatsSelector} from '../selectors/chats-selectors'
+import {selectChats} from '../selectors/chats-selectors'
 import {getChats} from '../store/chats/thunks'
 import {DrawerScreenProps} from '@react-navigation/drawer'
 import Chat from '../components/Chats/Chat'
+import {selectCurrentUserProfile} from '../selectors/auth-selectors'
+import {randomString} from '../utilits/dev-utilits'
+import {sendMessage} from '../store/messages/thunks'
 
 //TODO props type
 type Props = {}
@@ -14,9 +17,7 @@ type Props = {}
 const ChatsScreen: React.FC<DrawerScreenProps<Props>> = (props) => {
     const dispatch = useDispatch()
 
-    useEffect(() => {
-        dispatch(getChats(1))
-    }, [])
+    const currentUserProfile = useSelector(selectCurrentUserProfile)
 
     const onPress = (id: number) => {
         //TODO type never
@@ -24,11 +25,25 @@ const ChatsScreen: React.FC<DrawerScreenProps<Props>> = (props) => {
         props.navigation.navigate('Messages', {id})
     }
 
-    const chats = useSelector(chatsSelector)
+    useEffect(() => {
+        if (currentUserProfile) {
+            dispatch(getChats(currentUserProfile.id))
+        }
+    }, [currentUserProfile])
+    
+
+    const chats = useSelector(selectChats)
+    const currentUser = useSelector(selectCurrentUserProfile)
+
+    const send = () => {
+        if (chats.length > 0 && currentUser) {
+            dispatch(sendMessage(randomString(), chats[0].id, currentUser.id))
+        }
+    }
 
     return <View style={screenStyles.container}>
         <Button title={'Auth'} onPress={() => dispatch(auth('f', 'e'))}/>
-        <Button title={'User'} onPress={() => dispatch(getUser(1))}/>
+        <Button title={'Message'} onPress={send}/>
 
         {chats.map(item => (
             <Chat key={item.id} chat={item} onPress={onPress}/>

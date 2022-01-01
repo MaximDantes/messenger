@@ -1,11 +1,13 @@
-import {applyMiddleware, combineReducers, compose, createStore} from "redux";
-import authReducer from "./auth/reducer";
+import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
+import authReducer from './auth/reducer'
 import thunkMiddleware from 'redux-thunk'
 import chatsReducer from './chats/reducer'
+import messagesReducer from './app/reducer'
 
 const rootReducer = combineReducers({
     auth: authReducer,
     chats: chatsReducer,
+    messages: messagesReducer
 })
 
 

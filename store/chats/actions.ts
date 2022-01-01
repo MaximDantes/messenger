@@ -1,6 +1,6 @@
 import {IChat} from '../../types/dto'
 
-export const _setChats = (chats: IChat[]) => ({
-    type: 'chats/SET_CHATS',
+export const chatsReceived = (chats: IChat[]) => ({
+    type: 'chats/CHATS_RECEIVED',
     payload: chats
 } as const)
