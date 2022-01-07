@@ -1,6 +1,7 @@
 export interface IChat {
     readonly id: number
     readonly title: string
+    readonly messages: IMessage[]
 }
 
 export interface IAuthResponse {
@@ -10,6 +11,9 @@ export interface IAuthResponse {
 export interface IMessage {
     id: number
     text: string
+    chatId: number
+    userId: number
+    date: Date
 }
 
 export interface IProfile {

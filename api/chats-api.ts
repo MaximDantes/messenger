@@ -1,4 +1,4 @@
-import {IChat} from '../types/dto'
+import {IChat} from '../types/entities'
 import axiosInstance from './api'
 
 interface IChatsResponse {
@@ -9,6 +9,6 @@ export const chatsApi = {
     get: async (userId: number) => {
         const response = await axiosInstance.get<IChatsResponse>(`users/${userId}/chats/`)
 
-        return response.data.chats
+        return response.data.chats.map(item => ({...item, messages: []}))
     }
 }

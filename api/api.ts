@@ -14,7 +14,9 @@ axiosInstance.interceptors.response.use(
         if (status === 401) {
             await axiosInstance.post('token/refresh/')
 
-            await axiosInstance(originalRequest)
+            const response = await axiosInstance(originalRequest)
+
+            return response.data
         }
     })
 

@@ -1,35 +1,87 @@
-import {createDrawerNavigator} from '@react-navigation/drawer'
 import {NavigationContainer} from '@react-navigation/native'
-import React, {useEffect, useState} from 'react'
-import ChatsScreen from './screens/ChatsScreen'
+import React, {useEffect} from 'react'
 import LibraryScreen from './screens/LibraryScreen'
 import screensRoutes from './screens/routes'
-import {headerStyles} from './styles/common'
+import routes from './screens/routes'
 import {useDispatch, useSelector} from 'react-redux'
-import {selectToken} from './selectors/auth-selectors'
+import {auth} from './store/auth/thunks'
+import ProfileScreen from './screens/ProfileScreen'
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
+import Ionicons from 'react-native-vector-icons/Ionicons'
+import AuthScreen from './screens/AuthScreen'
+import {selectIsAuth} from './selectors/auth-selectors'
+import ChatsScreen from './screens/ChatsScreen'
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import MessagesScreen from './screens/MessagesScreen'
 
-const Drawer = createDrawerNavigator()
+const Tab = createBottomTabNavigator()
+const Stack = createNativeStackNavigator()
 
-const Main = () => {
+const MainNavigation: React.FC = () => {
+    return <Tab.Navigator
+        screenOptions={({route}) => ({
+            tabBarIcon: ({focused, color, size}) => {
+                let iconName
+
+                switch (route.name) {
+                    case routes.profile:
+                        iconName = 'people'
+                        break
+
+                    case routes.chats:
+                        iconName = 'people'
+                        break
+
+                    default:
+                        iconName = 'book'
+                }
+
+                return <Ionicons name={iconName} size={size} color={color}/>
+            },
+        })}
+    >
+        <Tab.Screen
+            name={screensRoutes.profile}
+            component={ProfileScreen}
+            options={{title: 'Профиль'}}
+        />
+        <Tab.Screen
+            name={screensRoutes.chats}
+            component={ChatsScreen}
+            options={{title: 'Диалоги'}}
+        />
+        <Tab.Screen
+            name={screensRoutes.library}
+            component={LibraryScreen}
+            options={{title: 'Библиотека'}}
+        />
+    </Tab.Navigator>
+}
+
+
+const Main: React.FC = () => {
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(auth('ggaek@ggaek.by', 'head'))
+        // dispatch(refreshToken())
+    }, [])
+
+    const isAuth = useSelector(selectIsAuth)
+
     return <NavigationContainer>
-        <Drawer.Navigator initialRouteName={'Chats'}>
-            <Drawer.Screen
-                name={screensRoutes.chats}
-                component={ChatsScreen}
-                options={{
-                    title: 'Диалоги',
-                    headerStyle: headerStyles.container,
-                }}
-            />
-            <Drawer.Screen
-                name={screensRoutes.library}
-                component={LibraryScreen}
-                options={{
-                    title: 'Библиотека',
-                    headerStyle: headerStyles.container,
-                }}
-            />
-        </Drawer.Navigator>
+        <Stack.Navigator>
+            {isAuth ?
+                <>
+                    <Stack.Screen name={routes.main} component={MainNavigation} options={{headerShown: false}}/>
+                    <Stack.Screen name={routes.messages} component={MessagesScreen}/>
+                </>
+
+                :
+
+                <Stack.Screen name={routes.auth} component={AuthScreen} options={{headerShown: false}}/>
+            }
+        </Stack.Navigator>
     </NavigationContainer>
 }
 

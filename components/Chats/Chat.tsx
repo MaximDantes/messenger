@@ -1,6 +1,6 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
-import {IChat} from '../../types/dto'
+import {IChat} from '../../types/entities'
 
 type Props = {
     chat: IChat
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
         marginVertical: 3,
     },
     text: {
+        color: '#000'
     },
 })
 

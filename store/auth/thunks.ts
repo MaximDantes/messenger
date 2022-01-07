@@ -1,8 +1,9 @@
 import authApi from '../../api/auth-api'
-import {profileReceived, authorized, tokenReceived} from './actions'
+import {authorized, tokenReceived} from './actions'
 import {AuthThunkResult} from './reducer'
-import messagesApi from '../../api/messages-api'
-import {startMessagesListening} from '../app/thunks'
+import messagesApi from '../../api/websocket-api'
+import {startMessagesListening} from '../chats/thunks'
+import {getProfile} from '../profile/thunks'
 
 export const auth = (email: string, password: string): AuthThunkResult => async (dispatch) => {
     try {
@@ -39,15 +40,5 @@ export const refreshToken = (): AuthThunkResult => async (dispatch) => {
         dispatch(authorized(false))
 
         dispatch(tokenReceived(''))
-    }
-}
-
-export const getProfile = (): AuthThunkResult => async (dispatch) => {
-    try {
-        const response = await authApi.getProfile()
-
-        dispatch(profileReceived(response))
-    } catch (e) {
-        console.error(e.message)
     }
 }

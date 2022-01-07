@@ -1,12 +1,11 @@
 import axiosInstance from './api'
-import {IAuthResponse, IProfile} from '../types/dto'
+import {IAuthResponse, IProfile} from '../types/entities'
 import {snakeToCamel} from '../utilits/case-convert'
 
 const authApi = {
     auth: async (email: string, password: string) => {
         const response = await axiosInstance.post<IAuthResponse>('token/', {
-            // email: 'ggaek@ggaek.by', password: 'head',
-            email: 'avramneoko6@gmail.com125', password: 'avramneoko6@gmail.com125',
+            email, password
         })
 
         return response.data

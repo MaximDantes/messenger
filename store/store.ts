@@ -2,14 +2,13 @@ import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
 import authReducer from './auth/reducer'
 import thunkMiddleware from 'redux-thunk'
 import chatsReducer from './chats/reducer'
-import messagesReducer from './app/reducer'
+import profileReducer from './profile/reducer'
 
 const rootReducer = combineReducers({
     auth: authReducer,
+    profile: profileReducer,
     chats: chatsReducer,
-    messages: messagesReducer
 })
-
 
 declare global {
     interface Window {

@@ -1,4 +1,4 @@
-import {IProfile} from '../../types/dto'
+import {IProfile} from '../../types/entities'
 
 export const authorized = (isAuth: boolean) => ({
     type: 'auth/AUTHORIZED',
@@ -8,9 +8,4 @@ export const authorized = (isAuth: boolean) => ({
 export const tokenReceived = (token: string) => ({
     type: 'auth/TOKEN_RECEIVED',
     payload: token
-} as const)
-
-export const profileReceived = (profile: IProfile) => ({
-    type: 'auth/PROFILE_RECEIVED',
-    payload: profile
 } as const)
