@@ -1,6 +1,5 @@
 import axiosInstance from './api'
-import {IAuthResponse, IProfile} from '../types/entities'
-import {snakeToCamel} from '../utilits/case-convert'
+import {IAuthResponse} from '../types/entities'
 
 const authApi = {
     auth: async (email: string, password: string) => {
@@ -16,12 +15,6 @@ const authApi = {
 
         return response.data
     },
-
-    getProfile: async () => {
-        const response = await axiosInstance.get<IProfile>('users/profile/')
-
-        return snakeToCamel(response.data)
-    }
 }
 
 export default authApi

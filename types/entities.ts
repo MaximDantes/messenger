@@ -1,7 +1,7 @@
 export interface IChat {
     readonly id: number
     readonly title: string
-    readonly messages: IMessage[]
+    messages: IMessage[]
 }
 
 export interface IAuthResponse {
@@ -9,16 +9,25 @@ export interface IAuthResponse {
 }
 
 export interface IMessage {
-    id: number
-    text: string
-    chatId: number
-    userId: number
-    date: Date
+    readonly id: number
+    readonly text: string
+    readonly chatId: number
+    readonly userId: number
+    readonly date: Date
+    readonly files: IServerFile[]
 }
 
 export interface IProfile {
-    id: number,
-    firstName: string,
-    lastName: string,
-    email: string
+    readonly id: number,
+    readonly firstName: string,
+    readonly lastName: string,
+    readonly email: string
+    readonly avatar: string
+}
+
+export interface IServerFile {
+    readonly id: number
+    readonly file: string,
+    readonly fileName: string,
+    readonly fileSize: number
 }

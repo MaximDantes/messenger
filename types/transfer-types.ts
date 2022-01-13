@@ -1,7 +1,8 @@
 import {IMessage} from './entities'
 
 export interface IMessages {
-    next: string
-    previous: string
+    nextCursor: string
+    previousCursor: string
+    lastRead: number
     results: IMessage[]
 }

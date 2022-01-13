@@ -2,11 +2,7 @@ import * as actions from './actions'
 import {ThunkAction} from 'redux-thunk'
 import {State} from '../store'
 import {IProfile} from '../../types/entities'
-
-type InferValues<T> = T extends { [key: string]: infer U } ? U : never
-export type Action = ReturnType<InferValues<typeof actions>>
-
-export type AuthThunkResult = ThunkAction<void, State, undefined, Action>
+import {ActionTemplate, ThunkTemplate} from '../../types/typescript'
 
 const initialState = {
     isAuth: false,
@@ -33,3 +29,6 @@ const authReducer = (state = initialState, action: Action): typeof initialState 
 }
 
 export default authReducer
+
+export type Action = ActionTemplate<typeof actions>
+export type Thunk = ThunkTemplate<Action>

@@ -1,7 +1,6 @@
 import * as actions from './actions'
-import {ThunkAction} from 'redux-thunk'
-import {State} from '../store'
 import {IProfile} from '../../types/entities'
+import {ActionTemplate, ThunkTemplate} from '../../types/typescript'
 
 const initialState = {
     profile: null as IProfile | null,
@@ -9,7 +8,7 @@ const initialState = {
 
 const profileReducer = (state = initialState, action: Action): typeof initialState => {
     switch (action.type) {
-        case 'auth/PROFILE_RECEIVED':
+        case 'profile/PROFILE_RECEIVED':
             return {
                 ...state,
                 profile: action.payload
@@ -22,7 +21,5 @@ const profileReducer = (state = initialState, action: Action): typeof initialSta
 
 export default profileReducer
 
-type InferValues<T> = T extends { [key: string]: infer U } ? U : never
-export type Action = ReturnType<InferValues<typeof actions>>
-
-export type Thunk = ThunkAction<void, State, undefined, Action>
+export type Action = ActionTemplate<typeof actions>
+export type Thunk = ThunkTemplate<Action>

@@ -6,12 +6,17 @@ export const chatsReceived = (chats: IChat[]) => ({
     payload: chats
 } as const)
 
-export const messagesReceived = (messages: IMessages) => ({
+export const messagesReceived = (messages: IMessages, chatId: number) => ({
     type: 'chats/MESSAGES_RECEIVED',
-    payload: messages
+    payload: {messages, chatId}
 } as const)
 
 export const messageReceived = (message: IMessage) => ({
     type: 'chats/MESSAGE_RECEIVED',
     payload: message
+} as const)
+
+export const messagesReceivingStateChanged = (isReceiving: boolean) => ({
+    type: 'chats/MESSAGES_RECEIVING_STATE_CHANGED',
+    payload: isReceiving
 } as const)

@@ -28,12 +28,12 @@ class WebSocketApi {
         this.subscribers = this.subscribers.filter(item => item !== callback)
     }
 
-    send(message: string, chatId: number) {
-        //TODO camel case to snake case
+    send(message: string, chatId: number, files: string[]) {
         this.ws?.send(JSON.stringify({
             message: {
                 text: message,
                 chat_id: chatId,
+                files
             }
         }))
     }

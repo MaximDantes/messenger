@@ -1,10 +1,12 @@
 import * as actions from './actions'
-import {ThunkAction} from 'redux-thunk'
-import {State} from '../store'
 import {IChat} from '../../types/entities'
+import {ActionTemplate, ThunkTemplate} from '../../types/typescript'
 
 const initialState = {
-    chats: [] as IChat[]
+    chats: [] as IChat[],
+    nextCursor: '',
+    previousCursor: '',
+    isReceivingMessages: false,
 }
 
 const chatsReducer = (state = initialState, action: Action): typeof initialState => {
@@ -15,26 +17,34 @@ const chatsReducer = (state = initialState, action: Action): typeof initialState
                 chats: action.payload
             }
 
+        case 'chats/MESSAGES_RECEIVING_STATE_CHANGED': {
+            return {
+                ...state,
+                isReceivingMessages: action.payload
+            }
+        }
+
         case 'chats/MESSAGES_RECEIVED': {
             let newChats = [...state.chats]
 
-            //TODO immutable
-            action.payload.results.map(message => {
-                const chat = newChats.find(chat => chat.id === message.chatId)
+            const chat = newChats.find(item => item.id === action.payload.chatId)
 
-                if (chat) {
-                    const newChat: IChat = {
-                        ...chat,
-                        messages: [...chat.messages, message]
-                    }
+            if (chat) {
+                const newMessages = [...chat.messages, ...action.payload.messages.results]
+                    .sort((next, prev) => next.date.getTime() - prev.date.getTime())
 
-                    newChats = [...newChats.filter(item => item.id !== newChat.id), newChat]
-                }
-            })
+                chat.messages = Array.from(new Set(newMessages.map(item => item.id)))
+                    .map(id => newMessages.find(item => item.id === id) || newMessages[0])
+
+                newChats = [...newChats.filter(item => item.id !== chat.id), {...chat}]
+            }
 
             return {
                 ...state,
-                chats: newChats
+                chats: newChats,
+                nextCursor: action.payload.messages.nextCursor || '',
+                previousCursor: action.payload.messages.previousCursor || ''
+
             }
         }
 
@@ -68,7 +78,5 @@ const chatsReducer = (state = initialState, action: Action): typeof initialState
 export default chatsReducer
 
 
-type InferValues<T> = T extends { [key: string]: infer U } ? U : never
-export type Action = ReturnType<InferValues<typeof actions>>
-
-export type Thunk = ThunkAction<void, State, undefined, Action>
+export type Action = ActionTemplate<typeof actions>
+export type Thunk = ThunkTemplate<Action>

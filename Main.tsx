@@ -13,6 +13,7 @@ import {selectIsAuth} from './selectors/auth-selectors'
 import ChatsScreen from './screens/ChatsScreen'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import MessagesScreen from './screens/MessagesScreen'
+import DocumentsScreen from './screens/DocumentsScreen'
 
 const Tab = createBottomTabNavigator()
 const Stack = createNativeStackNavigator()
@@ -63,7 +64,9 @@ const Main: React.FC = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        dispatch(auth('ggaek@ggaek.by', 'head'))
+        // dispatch(auth('ggaek@ggaek.by', 'head'))
+        // dispatch(auth('avramneoko6@gmail.com111', 'avramneoko6@gmail.com111'))
+        dispatch(auth('po2282@gmail.com', 'po2282@gmail.com'))
         // dispatch(refreshToken())
     }, [])
 
@@ -75,6 +78,7 @@ const Main: React.FC = () => {
                 <>
                     <Stack.Screen name={routes.main} component={MainNavigation} options={{headerShown: false}}/>
                     <Stack.Screen name={routes.messages} component={MessagesScreen}/>
+                    <Stack.Screen name={routes.documents} component={DocumentsScreen}/>
                 </>
 
                 :

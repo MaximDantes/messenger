@@ -10,5 +10,5 @@ export const chatsApi = {
         const response = await axiosInstance.get<IChatsResponse>(`users/${userId}/chats/`)
 
         return response.data.chats.map(item => ({...item, messages: []}))
-    }
+    },
 }

@@ -1,15 +1,15 @@
-import React, {useEffect, useState} from 'react'
-import {DrawerScreenProps} from '@react-navigation/drawer'
-import {Button, ScrollView, StyleSheet, TextInput, View} from 'react-native'
+import React, {useEffect, useRef} from 'react'
+import {NativeScrollEvent, ScrollView, StyleSheet, View} from 'react-native'
 import {screenStyles} from '../styles/common'
 import {useDispatch, useSelector} from 'react-redux'
 import {State} from '../store/store'
 import Message from '../components/Messages/Message'
-import {getChatMessages, sendMessage} from '../store/chats/thunks'
-import {selectChat} from '../selectors/chats-selectors'
-import * as DocumentPicker from 'expo-document-picker'
+import {getChatMessages, getNextChatMessages} from '../store/chats/thunks'
+import {selectChat, selectIsReceivingMessages} from '../selectors/chats-selectors'
 import {selectProfile} from '../selectors/profile-selectors'
 import {NativeStackScreenProps} from '@react-navigation/native-stack'
+import MessageForm from '../components/Messages/MessageForm'
+import screensRoutes from './routes'
 
 type Props = {}
 
@@ -20,10 +20,11 @@ const MessagesScreen: React.FC<NativeStackScreenProps<Props>> = (props) => {
 
     const dispatch = useDispatch()
 
-    const [message, setMessage] = useState('')
-
     const chat = useSelector((state: State) => selectChat(state, chatId))
     const profile = useSelector(selectProfile)
+    const isReceivingMessages = useSelector(selectIsReceivingMessages)
+
+    const scrollView = useRef<ScrollView>()
 
     useEffect(() => {
         dispatch(getChatMessages(chatId))
@@ -35,50 +36,51 @@ const MessagesScreen: React.FC<NativeStackScreenProps<Props>> = (props) => {
         })
     }, [chat])
 
+    useEffect(() => {
+        scrollView.current?.scrollToEnd({animated: true})
+    })
 
-    const send = () => {
-        if (message.trim() && chat && profile) {
-            dispatch(sendMessage(message.trim(), chat.id))
+    const showFile = (url: string) => {
+        //TODO type never
+        //@ts-ignore
+        props.navigation.navigate(screensRoutes.documents, {url})
+    }
 
-            setMessage('')
+    const loadPreviousMessages = () => {
+        if (!isReceivingMessages) {
+            dispatch(getNextChatMessages(chatId))
         }
     }
 
-    const pickFile = async () => {
-        const file = await DocumentPicker.getDocumentAsync()
-
-        console.log(file)
+    const isCloseToTop = ({layoutMeasurement, contentOffset, contentSize}: NativeScrollEvent) => {
+        return contentOffset.y === 0
     }
 
     return <View style={screenStyles.container}>
         <View style={styles.container}>
-            <ScrollView style={styles.messagesContainer}>
+            <ScrollView
+                style={styles.messagesContainer}
+                //@ts-ignore
+                ref={scrollView}
+                onScroll={({nativeEvent}) => {
+                    if (isCloseToTop(nativeEvent)) {
+                        loadPreviousMessages()
+                    }
+                }}
+                scrollEventThrottle={400}
+            >
                 {chat?.messages.map(item => (
                     <Message
                         key={item.id}
                         text={item.text}
                         time={item.date}
+                        files={item.files}
                         sentByCurrentUser={item.userId === profile?.id}
                     />
                 ))}
             </ScrollView>
 
-            <View style={styles.newMessageContainer}>
-                <Button title={'P'} onPress={pickFile}/>
-
-                <Button title={'S'} onPress={send}/>
-
-                <TextInput
-                    style={styles.newMessageInput}
-                    value={message}
-                    autoCapitalize={'sentences'}
-                    spellCheck={true}
-                    multiline={true}
-                    onChangeText={setMessage}
-                    placeholder={'Сообщение...'}
-                />
-
-            </View>
+            <MessageForm chatId={chatId} showFile={showFile}/>
         </View>
     </View>
 }
@@ -94,20 +96,6 @@ const styles = StyleSheet.create({
 
     messagesContainer: {
         width: '100%'
-    },
-
-    newMessageContainer: {
-        backgroundColor: '#dedede',
-        paddingHorizontal: 5,
-        paddingVertical: 10,
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-    },
-
-    newMessageInput: {
-        marginLeft: 10,
-        width: '100%',
     }
 })
 
