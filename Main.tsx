@@ -1,22 +1,37 @@
-import {NavigationContainer} from '@react-navigation/native'
+import {NavigationContainer, RouteProp} from '@react-navigation/native'
 import React, {useEffect} from 'react'
 import LibraryScreen from './screens/LibraryScreen'
-import screensRoutes from './screens/routes'
-import routes from './screens/routes'
 import {useDispatch, useSelector} from 'react-redux'
-import {auth} from './store/auth/thunks'
+import {auth, checkAuth} from './store/auth/auth-thunks'
 import ProfileScreen from './screens/ProfileScreen'
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import AuthScreen from './screens/AuthScreen'
-import {selectIsAuth} from './selectors/auth-selectors'
+import {selectAuthFetching, selectIsAuth} from './selectors/auth-selectors'
 import ChatsScreen from './screens/ChatsScreen'
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
+import {createNativeStackNavigator, NativeStackNavigationProp} from '@react-navigation/native-stack'
 import MessagesScreen from './screens/MessagesScreen'
 import DocumentsScreen from './screens/DocumentsScreen'
+import {Preloader} from './components/common/Preloader'
+import ImagesScreen from './screens/ImagesScreen'
 
-const Tab = createBottomTabNavigator()
-const Stack = createNativeStackNavigator()
+export type StackNavigatorParamList = {
+    Messages: {id: number},
+    Main: undefined,
+    Documents: undefined,
+    Images: {images: string[], position?: number}
+    Auth: undefined,
+}
+export type StackNavigationProps = NativeStackNavigationProp<StackNavigatorParamList>
+
+export type TabNavigatorParamList = {
+   Profile: undefined,
+   Chats: undefined,
+   Library: undefined,
+}
+
+const Tab = createBottomTabNavigator<TabNavigatorParamList>()
+const Stack = createNativeStackNavigator<StackNavigatorParamList>()
 
 const MainNavigation: React.FC = () => {
     return <Tab.Navigator
@@ -25,11 +40,11 @@ const MainNavigation: React.FC = () => {
                 let iconName
 
                 switch (route.name) {
-                    case routes.profile:
+                    case 'Profile':
                         iconName = 'people'
                         break
 
-                    case routes.chats:
+                    case 'Chats':
                         iconName = 'people'
                         break
 
@@ -42,17 +57,17 @@ const MainNavigation: React.FC = () => {
         })}
     >
         <Tab.Screen
-            name={screensRoutes.profile}
+            name={'Profile'}
             component={ProfileScreen}
             options={{title: 'Профиль'}}
         />
         <Tab.Screen
-            name={screensRoutes.chats}
+            name={'Chats'}
             component={ChatsScreen}
             options={{title: 'Диалоги'}}
         />
         <Tab.Screen
-            name={screensRoutes.library}
+            name={'Library'}
             component={LibraryScreen}
             options={{title: 'Библиотека'}}
         />
@@ -65,27 +80,50 @@ const Main: React.FC = () => {
 
     useEffect(() => {
         // dispatch(auth('ggaek@ggaek.by', 'head'))
-        // dispatch(auth('avramneoko6@gmail.com111', 'avramneoko6@gmail.com111'))
-        dispatch(auth('po2282@gmail.com', 'po2282@gmail.com'))
-        // dispatch(refreshToken())
+        // dispatch(auth('po13371@gmail.com', 'po13371@gmail.com'))
+        dispatch(checkAuth())
     }, [])
 
     const isAuth = useSelector(selectIsAuth)
+    const isAuthFetching = useSelector(selectAuthFetching)
 
     return <NavigationContainer>
-        <Stack.Navigator>
-            {isAuth ?
-                <>
-                    <Stack.Screen name={routes.main} component={MainNavigation} options={{headerShown: false}}/>
-                    <Stack.Screen name={routes.messages} component={MessagesScreen}/>
-                    <Stack.Screen name={routes.documents} component={DocumentsScreen}/>
-                </>
+        {isAuthFetching
+            ?
+            <Preloader/>
 
-                :
+            :
 
-                <Stack.Screen name={routes.auth} component={AuthScreen} options={{headerShown: false}}/>
-            }
-        </Stack.Navigator>
+            <Stack.Navigator>
+                {isAuth ?
+                    <>
+                        <Stack.Screen
+                            name={'Main'}
+                            component={MainNavigation}
+                            options={{headerShown: false}}
+
+                        />
+                        <Stack.Screen
+                            name={'Messages'}
+                            component={MessagesScreen}
+                        />
+                        <Stack.Screen
+                            name={'Documents'}
+                            component={DocumentsScreen}
+                        />
+                        <Stack.Screen
+                            name={'Images'}
+                            component={ImagesScreen}
+                        />
+                    </>
+
+                    :
+
+                    <Stack.Screen name={'Auth'} component={AuthScreen} options={{headerShown: false}}/>
+                }
+            </Stack.Navigator>
+
+        }
     </NavigationContainer>
 }
 

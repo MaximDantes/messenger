@@ -1,33 +1,53 @@
 export interface IChat {
-    readonly id: number
-    readonly title: string
+    id: number
+    title: string
     messages: IMessage[]
+    lastMessage: {
+        id: number,
+        text: string,
+        date: Date
+        user: {
+            avatar: string,
+        },
+    }
+    cover: string
 }
 
-export interface IAuthResponse {
-    readonly access: string
+export interface ITokenResponse {
+    access: string
+}
+
+
+export interface IPreloadMessage {
+    text: string
+    chatId: number
+    userId: number
+    files: {
+
+    }[]
 }
 
 export interface IMessage {
-    readonly id: number
-    readonly text: string
-    readonly chatId: number
-    readonly userId: number
-    readonly date: Date
-    readonly files: IServerFile[]
+    id: number
+    text: string
+    chatId: number
+    userId: number
+    date: Date
+    files: IServerFile[]
+    clientSideId?: number
 }
 
 export interface IProfile {
-    readonly id: number,
-    readonly firstName: string,
-    readonly lastName: string,
-    readonly email: string
-    readonly avatar: string
+    id: number,
+    firstName: string,
+    lastName: string,
+    email: string
+    avatar: string
 }
 
 export interface IServerFile {
-    readonly id: number
-    readonly file: string,
-    readonly fileName: string,
-    readonly fileSize: number
+    id: number
+    file: string,
+    fileName: string,
+    fileSize: number
 }

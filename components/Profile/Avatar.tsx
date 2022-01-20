@@ -1,5 +1,5 @@
 import React from 'react'
-import {Dimensions, ImageBackground, StyleSheet, TouchableOpacity} from 'react-native'
+import {Dimensions, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 
 //TODO image path
 //@ts-ignore
@@ -21,6 +21,7 @@ const Avatar: React.FC<Props> = (props) => {
         props.setFile(pickedFile)
     }
 
+
     return <>
         {props.editMode ?
             <TouchableOpacity onPress={pickFile}>
@@ -30,7 +31,13 @@ const Avatar: React.FC<Props> = (props) => {
                             ? {uri: props.file.uri}
                             : props.source ? {uri: props.source} : defaultAvatar}
                     style={styles.image}
-                />
+                >
+                    {props.editMode &&
+                        <View style={styles.framesContainer}>
+                            <Text style={styles.frameText}>ВЫБРАТЬ</Text>
+                        </View>
+                    }
+                </ImageBackground>
             </TouchableOpacity>
 
             :
@@ -47,6 +54,22 @@ const styles = StyleSheet.create({
     image: {
         height: Dimensions.get('window').width,
     },
+
+    framesContainer: {
+        flex: 1,
+        margin: 15,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 3,
+        borderStyle: 'solid',
+        borderColor: '#dddddd',
+        borderRadius: 15,
+    },
+
+    frameText: {
+        color: '#dddddd',
+        fontSize: 22,
+    }
 })
 
 export default Avatar

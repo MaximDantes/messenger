@@ -1,4 +1,4 @@
-import * as actions from './actions'
+import * as actions from './chats-actions'
 import {IChat} from '../../types/entities'
 import {ActionTemplate, ThunkTemplate} from '../../types/typescript'
 
@@ -7,6 +7,7 @@ const initialState = {
     nextCursor: '',
     previousCursor: '',
     isReceivingMessages: false,
+    clientSideId: -1,
 }
 
 const chatsReducer = (state = initialState, action: Action): typeof initialState => {
@@ -58,7 +59,7 @@ const chatsReducer = (state = initialState, action: Action): typeof initialState
             if (chat) {
                 const newChat: IChat = {
                     ...chat,
-                    messages: [...chat.messages, message]
+                    messages: [...chat.messages, message],
                 }
 
                 newChats = [...newChats.filter(item => item.id !== newChat.id), newChat]
@@ -66,6 +67,34 @@ const chatsReducer = (state = initialState, action: Action): typeof initialState
 
             return {
                 ...state,
+                chats: newChats
+            }
+        }
+
+        case 'chats/MESSAGE_SENT': {
+            let newChats = [...state.chats]
+
+            const chat = newChats.find(chat => chat.id === action.payload.chatId)
+
+            if (chat) {
+                const newChat: IChat = {
+                    ...chat,
+                    messages: [...chat.messages, {
+                        chatId: action.payload.chatId,
+                        files: [],
+                        id: state.clientSideId - 1,
+                        date: new Date(),
+                        text: action.payload.message,
+                        userId: 1
+                    }],
+                }
+
+                newChats = [...newChats.filter(item => item.id !== newChat.id), newChat]
+            }
+
+            return {
+                ...state,
+                clientSideId: state.clientSideId - 1,
                 chats: newChats
             }
         }

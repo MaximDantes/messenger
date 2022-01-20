@@ -1,7 +1,8 @@
 import axios from 'axios'
+import config from '../config'
 
 const axiosInstance = axios.create({
-    baseURL: 'https://ggaekappdocker.herokuapp.com/api/',
+    baseURL: `https://${config.serverAddress}/api/`,
     withCredentials: true,
 })
 

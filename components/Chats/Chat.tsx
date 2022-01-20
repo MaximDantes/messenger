@@ -1,4 +1,4 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
 import {IChat} from '../../types/entities'
 
@@ -13,7 +13,9 @@ const Chat: React.FC<Props> = (props) => {
         style={styles.container}
     >
         <View>
+            <ImageBackground source={{uri: props.chat.cover}} style={styles.image}/>
             <Text style={styles.text}>{props.chat.title}</Text>
+            <Text style={styles.text}>{props.chat.lastMessage?.text}</Text>
         </View>
     </TouchableOpacity>
 }
@@ -27,9 +29,15 @@ const styles = StyleSheet.create({
         width: '100%',
         marginVertical: 3,
     },
+
     text: {
         color: '#000'
     },
+
+    image: {
+        width: 50,
+        height: 50,
+    }
 })
 
 export default Chat

@@ -4,12 +4,11 @@ import {screenStyles} from '../styles/common'
 import {useDispatch, useSelector} from 'react-redux'
 import {State} from '../store/store'
 import Message from '../components/Messages/Message'
-import {getChatMessages, getNextChatMessages} from '../store/chats/thunks'
+import {getChatMessages, getNextChatMessages} from '../store/chats/chats-thunks'
 import {selectChat, selectIsReceivingMessages} from '../selectors/chats-selectors'
 import {selectProfile} from '../selectors/profile-selectors'
 import {NativeStackScreenProps} from '@react-navigation/native-stack'
 import MessageForm from '../components/Messages/MessageForm'
-import screensRoutes from './routes'
 
 type Props = {}
 
@@ -39,12 +38,6 @@ const MessagesScreen: React.FC<NativeStackScreenProps<Props>> = (props) => {
     useEffect(() => {
         scrollView.current?.scrollToEnd({animated: true})
     })
-
-    const showFile = (url: string) => {
-        //TODO type never
-        //@ts-ignore
-        props.navigation.navigate(screensRoutes.documents, {url})
-    }
 
     const loadPreviousMessages = () => {
         if (!isReceivingMessages) {
@@ -80,7 +73,7 @@ const MessagesScreen: React.FC<NativeStackScreenProps<Props>> = (props) => {
                 ))}
             </ScrollView>
 
-            <MessageForm chatId={chatId} showFile={showFile}/>
+            <MessageForm chatId={chatId}/>
         </View>
     </View>
 }

@@ -1,9 +1,9 @@
-import {Thunk} from './reducer'
+import {Thunk} from './chats-reducer'
 import {chatsApi} from '../../api/chats-api'
-import {chatsReceived, messagesReceived, messagesReceivingStateChanged} from './actions'
+import {chatsReceived, messageSent, messagesReceived, messagesReceivingStateChanged} from './chats-actions'
 import {IMessage} from '../../types/entities'
 import {Dispatch} from 'redux'
-import {messageReceived} from './actions'
+import {messageReceived} from './chats-actions'
 import wsApi from '../../api/websocket-api'
 import messagesApi from '../../api/messages-api'
 import {DocumentResult} from 'expo-document-picker'
@@ -39,7 +39,8 @@ export const stopMessagesListening = (): Thunk => async (dispatch) => {
     wsApi.unsubscribe(newMessageHandlerCreator(dispatch))
 }
 
-export const sendMessage = (message: string, chatId: number, files: DocumentResult[]): Thunk => async (dispatch) => {
+export const sendMessage = (message: string, chatId: number, userId: number, files: DocumentResult[]):
+    Thunk => async (dispatch) => {
     //TODO parallel files load
     const getFilesId = async () => {
         const filesId: string[] = []
@@ -57,7 +58,9 @@ export const sendMessage = (message: string, chatId: number, files: DocumentResu
 
     const filesId = await getFilesId()
 
-    wsApi.send(message, chatId, filesId)
+    const clientSideId = store.getState().chats.clientSideId
+
+    wsApi.send(message, chatId, clientSideId,filesId)
 }
 
 export const getChatMessages = (chatId: number): Thunk => async (dispatch) => {

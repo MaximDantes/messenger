@@ -3,7 +3,7 @@ import {DrawerScreenProps} from '@react-navigation/drawer'
 import {Button, StyleSheet, TextInput, View} from 'react-native'
 import {screenStyles} from '../styles/common'
 import {useDispatch} from 'react-redux'
-import {auth} from '../store/auth/thunks'
+import {auth} from '../store/auth/auth-thunks'
 
 type Props = {}
 

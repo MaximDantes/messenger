@@ -1,9 +1,10 @@
-import * as actions from './actions'
+import * as actions from './profile-actions'
 import {IProfile} from '../../types/entities'
 import {ActionTemplate, ThunkTemplate} from '../../types/typescript'
 
 const initialState = {
     profile: null as IProfile | null,
+    isFetching: false,
 }
 
 const profileReducer = (state = initialState, action: Action): typeof initialState => {
@@ -12,6 +13,18 @@ const profileReducer = (state = initialState, action: Action): typeof initialSta
             return {
                 ...state,
                 profile: action.payload
+            }
+
+        case 'profile/FETCHING_STARTED':
+            return {
+                ...state,
+                isFetching: true
+            }
+
+        case 'profile/FETCHING_FINISHED':
+            return {
+                ...state,
+                isFetching: false
             }
 
         default:

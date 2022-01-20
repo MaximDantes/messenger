@@ -1,22 +1,23 @@
-import {DrawerScreenProps} from '@react-navigation/drawer'
 import React, {useState} from 'react'
-import {Button, Dimensions, StyleSheet, Text, View} from 'react-native'
+import {Button, StyleSheet, Text, View} from 'react-native'
 import {useDispatch, useSelector} from 'react-redux'
 
 //TODO image path
 //@ts-ignore
 import defaultAvatar from './../assets/default-avatar.png'
-import {selectProfile} from '../selectors/profile-selectors'
+import {selectProfile, selectProfileFetching} from '../selectors/profile-selectors'
 import Avatar from '../components/Profile/Avatar'
 import {DocumentResult} from 'expo-document-picker'
-import {setAvatar} from '../store/profile/thunks'
-import * as FileSystem from 'expo-file-system'
+import {setAvatar} from '../store/profile/profile-thunks'
+import {Preloader} from '../components/common/Preloader'
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs'
 
 type Props = {}
 
-const ProfileScreen: React.FC<DrawerScreenProps<Props>> = (props) => {
+const ProfileScreen: React.FC<BottomTabScreenProps<Props>> = (props) => {
     const dispatch = useDispatch()
 
+    const isFetching = useSelector(selectProfileFetching)
     const profile = useSelector(selectProfile)
 
     const [editMode, setEditMode] = useState(false)
@@ -31,29 +32,33 @@ const ProfileScreen: React.FC<DrawerScreenProps<Props>> = (props) => {
         }
     }
 
-    return <View style={styles.container}>
-        <View>
-            <Avatar editMode={editMode} source={profile?.avatar} file={file} setFile={setFile}/>
+    return isFetching
+        ?
+        <Preloader/>
+        :
+        <View style={styles.container}>
+            <View>
+                <Avatar editMode={editMode} source={profile?.avatar} file={file} setFile={setFile}/>
 
-            <View><Text>{profile?.firstName || 'Имя'}</Text></View>
-            <View><Text>{profile?.lastName || 'Фамилия'}</Text></View>
-            <View><Text>{profile?.email}</Text></View>
-        </View>
+                <View><Text>{profile?.firstName || 'Имя'}</Text></View>
+                <View><Text>{profile?.lastName || 'Фамилия'}</Text></View>
+                <View><Text>{profile?.email}</Text></View>
+            </View>
 
-        <View style={styles.buttonsContainer}>
-            {editMode ?
-                <>
-                    <Button title={'Сохранить'} onPress={save}/>
-                    <Button title={'Отмена'} onPress={() => setEditMode(false)}/>
-                </>
-                :
-                <>
-                    <Button title={'Редактировать'} onPress={() => setEditMode(true)}/>
-                    <Button title={'Изменить пароль'} onPress={() => setEditMode(true)}/>
-                </>
-            }
+            <View style={styles.buttonsContainer}>
+                {editMode ?
+                    <>
+                        <Button title={'Сохранить'} onPress={save}/>
+                        <Button title={'Отмена'} onPress={() => setEditMode(false)}/>
+                    </>
+                    :
+                    <>
+                        <Button title={'Редактировать'} onPress={() => setEditMode(true)}/>
+                        <Button title={'Изменить пароль'} onPress={() => setEditMode(true)}/>
+                    </>
+                }
+            </View>
         </View>
-    </View>
 }
 
 const styles = StyleSheet.create({

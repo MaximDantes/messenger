@@ -8,13 +8,19 @@ const profileApi = {
     get: async () => {
         const response = await axiosInstance.get<IProfile>('users/me/')
 
-        return snakeToCamel(response.data)
+        return {
+            data: snakeToCamel<IProfile>(response.data),
+            status: response.status
+        }
     },
 
     edit: async (profile: IProfile) => {
         const response = await axiosInstance.get<IProfile>('users/profile/')
 
-        return snakeToCamel(response.data)
+        return {
+            data: snakeToCamel<IProfile>(response.data),
+            status: response.status
+        }
     },
 
     setAvatar: async (file: DocumentResult) => {

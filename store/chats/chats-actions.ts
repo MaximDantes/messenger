@@ -20,3 +20,8 @@ export const messagesReceivingStateChanged = (isReceiving: boolean) => ({
     type: 'chats/MESSAGES_RECEIVING_STATE_CHANGED',
     payload: isReceiving
 } as const)
+
+export const messageSent = (message: string, chatId: number) => ({
+    type: 'chats/MESSAGE_SENT',
+    payload: {message, chatId,}
+} as const)

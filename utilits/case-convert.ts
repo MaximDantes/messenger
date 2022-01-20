@@ -16,7 +16,7 @@ const isObject = function (o: any) {
     return o === Object(o) && !isArray(o) && typeof o !== 'function'
 }
 
-export const snakeToCamel = (o: any) => {
+export const snakeToCamel = <T>(o: any): T => {
     if (isObject(o)) {
         const n = {}
 
@@ -26,7 +26,7 @@ export const snakeToCamel = (o: any) => {
                 n[toCamel(k)] = snakeToCamel(o[k])
             })
 
-        return n
+        return n as T
     } else if (isArray(o)) {
         return o.map((i: any) => {
             return snakeToCamel(i)

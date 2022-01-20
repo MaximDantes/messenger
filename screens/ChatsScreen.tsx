@@ -3,15 +3,15 @@ import {useDispatch, useSelector} from 'react-redux'
 import {View} from 'react-native'
 import {screenStyles} from '../styles/common'
 import {selectChats} from '../selectors/chats-selectors'
-import {getChats} from '../store/chats/thunks'
-import {DrawerScreenProps} from '@react-navigation/drawer'
+import {getChats} from '../store/chats/chats-thunks'
 import Chat from '../components/Chats/Chat'
 import {selectProfile} from '../selectors/profile-selectors'
+import {BottomTabScreenProps} from '@react-navigation/bottom-tabs'
 
 //TODO props type
 type Props = {}
 
-const ChatsScreen: React.FC<DrawerScreenProps<Props>> = (props) => {
+const ChatsScreen: React.FC<BottomTabScreenProps<Props>> = (props) => {
     const dispatch = useDispatch()
 
     const profile = useSelector(selectProfile)

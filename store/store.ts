@@ -1,8 +1,8 @@
 import {applyMiddleware, combineReducers, compose, createStore} from 'redux'
-import authReducer from './auth/reducer'
+import authReducer from './auth/auth-reducer'
 import thunkMiddleware from 'redux-thunk'
-import chatsReducer from './chats/reducer'
-import profileReducer from './profile/reducer'
+import chatsReducer from './chats/chats-reducer'
+import profileReducer from './profile/profile-reducer'
 
 const rootReducer = combineReducers({
     auth: authReducer,

@@ -1,6 +1,7 @@
 import {IMessage} from '../types/entities'
 import {snakeToCamel} from '../utilits/case-convert'
 import {formatDate} from '../utilits/format-date'
+import config from '../config'
 
 type Subscriber = (message: IMessage) => void
 
@@ -28,12 +29,13 @@ class WebSocketApi {
         this.subscribers = this.subscribers.filter(item => item !== callback)
     }
 
-    send(message: string, chatId: number, files: string[]) {
+    send(message: string, chatId: number, clientSideId: number, files: string[]) {
         this.ws?.send(JSON.stringify({
             message: {
                 text: message,
                 chat_id: chatId,
-                files
+                files,
+                client_side_id: clientSideId,
             }
         }))
     }
@@ -41,7 +43,7 @@ class WebSocketApi {
     private createChannel() {
         this.ws?.close()
         this.ws?.removeEventListener('close', this.closeHandler)
-        this.ws = new WebSocket(`wss://ggaekappdocker.herokuapp.com/ws/chat/?access=${this._token}`)
+        this.ws = new WebSocket(`wss://${config.serverAddress}/ws/chat/?access=${this._token}`)
         this.ws.addEventListener('close', this.closeHandler)
         this.ws.addEventListener('message', this.messageReceivedHandler)
     }
