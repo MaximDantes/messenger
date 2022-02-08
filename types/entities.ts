@@ -1,53 +1,64 @@
+import {FileType} from './file-types'
+
 export interface IChat {
-    id: number
-    title: string
-    messages: IMessage[]
-    lastMessage: {
-        id: number,
-        text: string,
-        date: Date
-        user: {
-            avatar: string,
-        },
-    }
-    cover: string
+    readonly id: number
+    readonly title: string
+    readonly lastMessage: {
+        readonly id: number
+        readonly text: string
+        readonly date: Date
+        readonly user: {
+            readonly avatar: string
+        }
+    } | null
+    readonly cover: string | null
+    readonly nextMessagesCursor: string
+    readonly previousMessagesCursor: string
+    readonly nextFilesCursor: string
+    readonly previousFilesCursor: string
+    readonly nextImagesCursor: string
+    readonly previousImagesCursor: string
 }
 
 export interface ITokenResponse {
-    access: string
-}
-
-
-export interface IPreloadMessage {
-    text: string
-    chatId: number
-    userId: number
-    files: {
-
-    }[]
+    readonly access: string
 }
 
 export interface IMessage {
-    id: number
-    text: string
-    chatId: number
-    userId: number
-    date: Date
-    files: IServerFile[]
-    clientSideId?: number
+    readonly id: number
+    readonly text: string
+    readonly chatId: number
+    readonly date: Date
+    readonly files: IFile[]
+    readonly user: {
+        id: number
+        firstName: string
+        lastName: string
+        avatar: string
+    }
+    readonly inSending?: boolean
+    readonly clientSideId?: number
 }
 
 export interface IProfile {
-    id: number,
-    firstName: string,
-    lastName: string,
-    email: string
-    avatar: string
+    readonly id: number,
+    readonly firstName: string
+    readonly lastName: string
+    readonly email: string
+    readonly avatar: string
 }
 
-export interface IServerFile {
-    id: number
-    file: string,
-    fileName: string,
-    fileSize: number
+export interface IFile {
+    readonly id: number
+    readonly file: string
+    readonly fileName?: string
+    readonly fileSize?: number
+    readonly fileType?: FileType
+    readonly chatId?: number
+}
+
+export interface IArticle {
+    title: string
+    description: string
+    files: IFile[]
 }

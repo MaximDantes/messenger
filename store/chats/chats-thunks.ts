@@ -1,25 +1,7 @@
-import {Thunk} from './chats-reducer'
+import {Cursors, Thunk} from './chats-reducer'
 import {chatsApi} from '../../api/chats-api'
-import {chatsReceived, messageSent, messagesReceived, messagesReceivingStateChanged} from './chats-actions'
+import {chatsReceived, cursorChanged, lastMessageChanged} from './chats-actions'
 import {IMessage} from '../../types/entities'
-import {Dispatch} from 'redux'
-import {messageReceived} from './chats-actions'
-import wsApi from '../../api/websocket-api'
-import messagesApi from '../../api/messages-api'
-import {DocumentResult} from 'expo-document-picker'
-import store from '../store'
-
-let _newMessageHandler: ((message: IMessage) => void) | null = null
-
-const newMessageHandlerCreator = (dispatch: Dispatch) => {
-    if (!_newMessageHandler) {
-        _newMessageHandler = (message: IMessage) => {
-            dispatch(messageReceived(message))
-        }
-    }
-
-    return _newMessageHandler
-}
 
 export const getChats = (userId: number): Thunk => async (dispatch) => {
     try {
@@ -31,57 +13,10 @@ export const getChats = (userId: number): Thunk => async (dispatch) => {
     }
 }
 
-export const startMessagesListening = (): Thunk => async (dispatch) => {
-    wsApi.subscribe(newMessageHandlerCreator(dispatch))
+export const setCursors = (cursors: Cursors, chatId: number): Thunk => async (dispatch) => {
+    dispatch(cursorChanged(cursors, chatId))
 }
 
-export const stopMessagesListening = (): Thunk => async (dispatch) => {
-    wsApi.unsubscribe(newMessageHandlerCreator(dispatch))
+export const setLastMessage = (message: IMessage): Thunk => async (dispatch) => {
+    dispatch(lastMessageChanged(message))
 }
-
-export const sendMessage = (message: string, chatId: number, userId: number, files: DocumentResult[]):
-    Thunk => async (dispatch) => {
-    //TODO parallel files load
-    const getFilesId = async () => {
-        const filesId: string[] = []
-
-        if (files.length > 0) {
-            for (const item of files) {
-                const response = await messagesApi.sendFile(chatId, item)
-
-                filesId.push(String(response.id))
-            }
-        }
-
-        return filesId
-    }
-
-    const filesId = await getFilesId()
-
-    const clientSideId = store.getState().chats.clientSideId
-
-    wsApi.send(message, chatId, clientSideId,filesId)
-}
-
-export const getChatMessages = (chatId: number): Thunk => async (dispatch) => {
-    dispatch(messagesReceivingStateChanged(true))
-
-    const result = await messagesApi.get(chatId)
-
-    dispatch(messagesReceived(result, chatId))
-
-    dispatch(messagesReceivingStateChanged(false))
-}
-
-export const getNextChatMessages = (chatId: number): Thunk => async (dispatch) => {
-    dispatch(messagesReceivingStateChanged(true))
-
-    const next = store.getState().chats.nextCursor
-
-    const result = await messagesApi.get(chatId, next)
-
-    dispatch(messagesReceived(result, chatId))
-
-    dispatch(messagesReceivingStateChanged(false))
-}
-

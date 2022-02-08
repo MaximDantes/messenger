@@ -4,7 +4,7 @@ import LibraryScreen from './screens/LibraryScreen'
 import {useDispatch, useSelector} from 'react-redux'
 import {auth, checkAuth} from './store/auth/auth-thunks'
 import ProfileScreen from './screens/ProfileScreen'
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
+import {BottomTabNavigationProp, createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import AuthScreen from './screens/AuthScreen'
 import {selectAuthFetching, selectIsAuth} from './selectors/auth-selectors'
@@ -14,21 +14,11 @@ import MessagesScreen from './screens/MessagesScreen'
 import DocumentsScreen from './screens/DocumentsScreen'
 import {Preloader} from './components/common/Preloader'
 import ImagesScreen from './screens/ImagesScreen'
-
-export type StackNavigatorParamList = {
-    Messages: {id: number},
-    Main: undefined,
-    Documents: undefined,
-    Images: {images: string[], position?: number}
-    Auth: undefined,
-}
-export type StackNavigationProps = NativeStackNavigationProp<StackNavigatorParamList>
-
-export type TabNavigatorParamList = {
-   Profile: undefined,
-   Chats: undefined,
-   Library: undefined,
-}
+import AttachmentsScreen from './screens/AttachmentsScreen'
+import {IArticle, IFile} from './types/entities'
+import {Alert} from 'react-native'
+import ArticleScreen from './screens/ArticleScreen'
+import {StackNavigatorParamList, TabNavigatorParamList} from './types/screens'
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>()
 const Stack = createNativeStackNavigator<StackNavigatorParamList>()
@@ -79,8 +69,6 @@ const Main: React.FC = () => {
     const dispatch = useDispatch()
 
     useEffect(() => {
-        // dispatch(auth('ggaek@ggaek.by', 'head'))
-        // dispatch(auth('po13371@gmail.com', 'po13371@gmail.com'))
         dispatch(checkAuth())
     }, [])
 
@@ -114,6 +102,15 @@ const Main: React.FC = () => {
                         <Stack.Screen
                             name={'Images'}
                             component={ImagesScreen}
+                        />
+                        <Stack.Screen
+                            name={'Attachments'}
+                            component={AttachmentsScreen}
+                            options={{title: 'Вложения'}}
+                        />
+                        <Stack.Screen
+                            name={'Article'}
+                            component={ArticleScreen}
                         />
                     </>
 

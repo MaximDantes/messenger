@@ -1,8 +1,5 @@
 import * as actions from './auth-actions'
-import {ThunkAction} from 'redux-thunk'
-import {State} from '../store'
-import {IProfile} from '../../types/entities'
-import {ActionTemplate, ThunkTemplate} from '../../types/typescript'
+import {ActionTemplate, ThunkTemplate} from '../../types/redux'
 import messagesApi from '../../api/websocket-api'
 
 const initialState = {

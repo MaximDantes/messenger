@@ -10,11 +10,9 @@ import Avatar from '../components/Profile/Avatar'
 import {DocumentResult} from 'expo-document-picker'
 import {setAvatar} from '../store/profile/profile-thunks'
 import {Preloader} from '../components/common/Preloader'
-import {BottomTabScreenProps} from '@react-navigation/bottom-tabs'
+import {ScreenProps} from '../types/screens'
 
-type Props = {}
-
-const ProfileScreen: React.FC<BottomTabScreenProps<Props>> = (props) => {
+const ProfileScreen: React.FC<ScreenProps<'Profile'>> = (props) => {
     const dispatch = useDispatch()
 
     const isFetching = useSelector(selectProfileFetching)

@@ -1,6 +1,5 @@
 import {ScrollView, StyleSheet, TextInput, TouchableOpacity, View} from 'react-native'
 import React, {useState} from 'react'
-import {sendMessage} from '../../store/chats/chats-thunks'
 import {useDispatch, useSelector} from 'react-redux'
 import * as DocumentPicker from 'expo-document-picker'
 import {DocumentResult} from 'expo-document-picker'
@@ -9,8 +8,9 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import {useNavigation} from '@react-navigation/native'
 import {StackNavigationProps} from '../../Main'
-import {isFileImage} from '../../types/file-types'
+import {isFileTypeImage} from '../../types/file-types'
 import {selectProfile} from '../../selectors/profile-selectors'
+import {sendMessage} from '../../store/messages/messages-thunks'
 
 type Props = {
     chatId: number
@@ -50,7 +50,7 @@ const MessageForm: React.FC<Props> = (props) => {
         //TODO not image position
         const images: string[] = []
         files.map(item => {
-            if (item.type === 'success' && isFileImage(item.mimeType)) {
+            if (item.type === 'success' && isFileTypeImage(item.mimeType)) {
                 images.push(item.uri)
             }
         })

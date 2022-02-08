@@ -1,27 +1,17 @@
 import {IChat, IMessage} from '../../types/entities'
-import {IMessages} from '../../types/transfer-types'
+import {Cursors} from './chats-reducer'
 
 export const chatsReceived = (chats: IChat[]) => ({
     type: 'chats/CHATS_RECEIVED',
     payload: chats
 } as const)
 
-export const messagesReceived = (messages: IMessages, chatId: number) => ({
-    type: 'chats/MESSAGES_RECEIVED',
-    payload: {messages, chatId}
+export const cursorChanged = (cursors: Cursors, chatId: number) => ({
+    type: 'chats/CURSORS_CHANGED',
+    payload: {cursors, chatId}
 } as const)
 
-export const messageReceived = (message: IMessage) => ({
-    type: 'chats/MESSAGE_RECEIVED',
+export const lastMessageChanged = (message: IMessage) => ({
+    type: 'chats/LAST_MESSAGE_CHANGED',
     payload: message
-} as const)
-
-export const messagesReceivingStateChanged = (isReceiving: boolean) => ({
-    type: 'chats/MESSAGES_RECEIVING_STATE_CHANGED',
-    payload: isReceiving
-} as const)
-
-export const messageSent = (message: string, chatId: number) => ({
-    type: 'chats/MESSAGE_SENT',
-    payload: {message, chatId,}
 } as const)

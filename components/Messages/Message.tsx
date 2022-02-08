@@ -1,28 +1,26 @@
-import {Image, StyleSheet, Text, View} from 'react-native'
+import {Image, ImageBackground, StyleSheet, Text, View} from 'react-native'
 import React from 'react'
-import {IServerFile} from '../../types/entities'
+import {IFile} from '../../types/entities'
 import {NativeStackNavigatorProps} from 'react-native-screens/lib/typescript/native-stack/types'
 import {NativeStackNavigationProp} from '@react-navigation/native-stack'
+import MessageFiles from './MessageFiles'
 
 type Props = {
     text: string
     time: Date
-    files: IServerFile[]
+    files: IFile[]
     sentByCurrentUser: boolean
+    inSending: boolean
 }
 
 const Message: React.FC<Props> = (props) => {
     return <View style={styles.container}>
+        {props.inSending && <Text>SENDING</Text>}
+
         <View style={props.sentByCurrentUser ? currentUserMessage : styles.message}>
             <Text>{props.text}</Text>
 
-            {props.files.map(item => (
-                <Image
-                    key={item.id}
-                    style={styles.image}
-                    source={{uri: item.file}}
-                />
-            ))}
+            <MessageFiles files={props.files}/>
 
             <View style={styles.date}>
                 <Text>{props.time.getHours()}:{props.time.getMinutes()}</Text>
@@ -49,11 +47,6 @@ const styles = StyleSheet.create({
     currentUserMessage: {
         backgroundColor: '#E0EFFF',
         alignSelf: 'flex-end',
-    },
-
-    image: {
-        height: 300,
-        width: 300,
     },
 
     date: {

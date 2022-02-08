@@ -25,10 +25,6 @@ class WebSocketApi {
         this.subscribers.push(callback)
     }
 
-    unsubscribe(callback: Subscriber) {
-        this.subscribers = this.subscribers.filter(item => item !== callback)
-    }
-
     send(message: string, chatId: number, clientSideId: number, files: string[]) {
         this.ws?.send(JSON.stringify({
             message: {
@@ -49,14 +45,19 @@ class WebSocketApi {
     }
 
     private closeHandler() {
+        //TODO reconnect
         console.log('ws closed')
-        setTimeout(this.createChannel, 3000)
+        // setTimeout(() => {
+        //     this.createChannel()
+        // }, 3000)
     }
 
     private messageReceivedHandler = (e: MessageEvent) => {
-        this.subscribers.forEach(item =>
-            item(formatDate(snakeToCamel(JSON.parse(e.data))) as IMessage))
+        this.subscribers.forEach(item => {
+            item(formatDate(snakeToCamel(JSON.parse(e.data))) as IMessage)
+        })
     }
+
 }
 
 export default new WebSocketApi()

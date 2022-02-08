@@ -12,9 +12,10 @@ const Chat: React.FC<Props> = (props) => {
         onPress={() => props.onPress(props.chat.id)}
         style={styles.container}
     >
-        <View>
-            <ImageBackground source={{uri: props.chat.cover}} style={styles.image}/>
-            <Text style={styles.text}>{props.chat.title}</Text>
+        {props.chat.cover && <ImageBackground source={{uri: props.chat.cover}} style={styles.image}/>}
+
+        <View style={styles.textContainer}>
+            <Text style={styles.title}>{props.chat.title}</Text>
             <Text style={styles.text}>{props.chat.lastMessage?.text}</Text>
         </View>
     </TouchableOpacity>
@@ -22,16 +23,26 @@ const Chat: React.FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#E0EFFF',
-        borderRadius: 5,
-        paddingVertical: 15,
-        paddingHorizontal: 10,
         width: '100%',
+        flexDirection: 'row',
         marginVertical: 3,
+        padding: 7,
+        borderRadius: 5,
+        backgroundColor: '#E0EFFF',
+    },
+
+    textContainer: {
+        paddingHorizontal: 5,
+    },
+
+    title: {
+        color: '#000',
     },
 
     text: {
-        color: '#000'
+        flex: 1,
+        color: '#000',
+        justifyContent: 'center',
     },
 
     image: {

@@ -1,13 +1,11 @@
 import React, {useState} from 'react'
-import {DrawerScreenProps} from '@react-navigation/drawer'
 import {Button, StyleSheet, TextInput, View} from 'react-native'
 import {screenStyles} from '../styles/common'
 import {useDispatch} from 'react-redux'
 import {auth} from '../store/auth/auth-thunks'
+import {ScreenProps} from '../types/screens'
 
-type Props = {}
-
-const AuthScreen: React.FC<DrawerScreenProps<Props>> = (props) => {
+const AuthScreen: React.FC<ScreenProps<'Auth'>> = () => {
     const dispatch = useDispatch()
 
     const login = () => {
@@ -17,7 +15,7 @@ const AuthScreen: React.FC<DrawerScreenProps<Props>> = (props) => {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
 
-    return <View style={screenStyle}>
+    return <View style={[screenStyles.container, styles.container]}>
         <View>
             <TextInput placeholder={'Email'} value={email} onChangeText={setEmail}/>
         </View>
@@ -38,9 +36,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
 })
-
-//TODO remove error
-// @ts-ignore
-const screenStyle = StyleSheet.compose(screenStyles.container, styles.container)
 
 export default AuthScreen

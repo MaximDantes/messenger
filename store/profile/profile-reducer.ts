@@ -1,6 +1,6 @@
 import * as actions from './profile-actions'
 import {IProfile} from '../../types/entities'
-import {ActionTemplate, ThunkTemplate} from '../../types/typescript'
+import {ActionTemplate, ThunkTemplate} from '../../types/redux'
 
 const initialState = {
     profile: null as IProfile | null,

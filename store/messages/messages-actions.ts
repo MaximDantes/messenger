@@ -1,5 +1,4 @@
-import {IChat, IMessage} from '../../types/entities'
-import {IMessages} from '../../types/transfer-types'
+import {IMessage} from '../../types/entities'
 
 export const messagesReceived = (messages: IMessage[]) => ({
     type: 'messages/MESSAGES_RECEIVED',
@@ -9,4 +8,14 @@ export const messagesReceived = (messages: IMessage[]) => ({
 export const messageReceived = (message: IMessage) => ({
     type: 'messages/MESSAGE_RECEIVED',
     payload: message
+} as const)
+
+export const messageSent = (message: IMessage) => ({
+    type: 'messages/MESSAGE_SENT',
+    payload: message
+} as const)
+
+export const fetchingChanged = (value: boolean) => ({
+    type: 'messages/FETCHING_CHANGED',
+    payload: value
 } as const)

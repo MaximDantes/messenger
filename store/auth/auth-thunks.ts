@@ -1,9 +1,9 @@
 import authApi from '../../api/auth-api'
 import {authorized, fetchingFinished, fetchingStarted, tokenReceived} from './auth-actions'
 import {Thunk} from './auth-reducer'
-import {startMessagesListening} from '../chats/chats-thunks'
 import {getProfile} from '../profile/profile-thunks'
 import {statusCodes} from '../../types/status-codes'
+import {startMessagesListening} from '../messages/messages-thunks'
 
 export const auth = (email: string, password: string): Thunk => async (dispatch) => {
     try {
@@ -38,16 +38,21 @@ export const refreshToken = (): Thunk => async (dispatch) => {
 }
 
 export const checkAuth = (): Thunk => async (dispatch) => {
-    dispatch(fetchingStarted())
+    try {
+        dispatch(fetchingStarted())
 
-    const response = await authApi.refreshToken()
+        const response = await authApi.refreshToken()
 
-    if (response.status === statusCodes.success) {
-        dispatch(getProfile())
-        dispatch(authorized(true))
-        dispatch(tokenReceived(response.data.access))
-        dispatch(startMessagesListening())
+        if (response.status === statusCodes.success) {
+            dispatch(getProfile())
+            dispatch(authorized(true))
+            dispatch(tokenReceived(response.data.access))
+            dispatch(startMessagesListening())
+        }
+    } catch (e) {
+        console.error(e)
+    } finally {
+        dispatch(fetchingFinished())
     }
 
-    dispatch(fetchingFinished())
 }

@@ -1,23 +1,56 @@
-import React from 'react'
-import {ImageBackground, StyleSheet, View, Text} from 'react-native'
-import {RouteProp} from '@react-navigation/native'
-import {StackNavigatorParamList} from '../Main'
-import Carousel from 'react-native-snap-carousel'
+import React, {useEffect} from 'react'
+import {Dimensions, Image, StyleSheet, View} from 'react-native'
+import {RouteProp, useNavigation} from '@react-navigation/native'
+import Swiper from 'react-native-web-swiper'
+import {NavigationProps, ScreenProps} from '../types/screens'
 
+const ImagesScreen: React.FC<ScreenProps<'Images'>> = (props) => {
+    const paramsImages = props.route.params.images
+    const position = props.route.params.position || 0
 
-type ScreenRouteProp<T extends keyof StackNavigatorParamList> = RouteProp<StackNavigatorParamList, T>
+    const navigation = useNavigation<NavigationProps>()
 
-type Props<T extends keyof StackNavigatorParamList> = {
-    route: ScreenRouteProp<T>
-}
+    const setTitle = (index: number) => {
+        navigation.setOptions({
+            title: `${index}/${paramsImages.length}`
+        })
+    }
 
-const ImagesScreen: React.FC<Props<'Images'>> = (props) => {
-    const images = props.route.params.images
-    const position = props.route.params.position
+    useEffect(() => {
+        setTitle(position + 1)
+    }, [paramsImages, position])
 
-    return <View>
-
+    return <View style={styles.container}>
+        <Swiper
+            controlsEnabled={false}
+            onIndexChanged={index => setTitle(index + 1)}
+            from={position}
+        >
+            {paramsImages.map((item, index) => (
+                <View key={item + index}>
+                    <Image style={styles.image} source={{uri: item}}/>
+                </View>
+            ))}
+        </Swiper>
     </View>
 }
+
+const win = Dimensions.get('window')
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    slideContainer: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    image: {
+        width: win.width,
+        height: '100%',
+        resizeMode: 'contain',
+    }
+})
 
 export default ImagesScreen

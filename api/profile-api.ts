@@ -6,7 +6,7 @@ import {Platform} from 'react-native'
 
 const profileApi = {
     get: async () => {
-        const response = await axiosInstance.get<IProfile>('users/me/')
+        const response = await axiosInstance.get<IProfile>('users/me')
 
         return {
             data: snakeToCamel<IProfile>(response.data),
@@ -15,7 +15,7 @@ const profileApi = {
     },
 
     edit: async (profile: IProfile) => {
-        const response = await axiosInstance.get<IProfile>('users/profile/')
+        const response = await axiosInstance.get<IProfile>('users/profile')
 
         return {
             data: snakeToCamel<IProfile>(response.data),
@@ -39,7 +39,7 @@ const profileApi = {
             }
         }
 
-        const response = await axiosInstance.post<{avatar: string}>('users/me/avatar', formData)
+        const response = await axiosInstance.post<{avatar: string}>('users/me/avatar/ну ', formData)
 
         return response.data.avatar
     }
