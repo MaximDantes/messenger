@@ -1,8 +1,7 @@
 import axiosInstance from './api'
 import {snakeToCamel} from '../utilits/case-convert'
 import {formatDate} from '../utilits/format-date'
-import {IMessage} from '../types/entities'
-import {DocumentResult} from 'expo-document-picker'
+import {IFile, IMessage} from '../types/entities'
 
 const messagesApi = {
     get: async (chatId: number, cursor?: string) => {
@@ -23,25 +22,23 @@ const messagesApi = {
 
         return {
             ...camelCase,
-            results: camelCase.results.map((item: IMessage) => formatDate(item))
+            results: camelCase.results.map((item: IMessage) => formatDate<IMessage>(item))
         }
     },
 
-    sendFile: async (chatId: number, file: DocumentResult) => {
+    sendFile: async (chatId: number, file: IFile) => {
         const formData = new FormData()
 
-        if (file.type === 'success') {
-            if (file.file) {
-                formData.append('file', file.file)
-            } else {
-                formData.append('file', {
-                    //@ts-ignore
-                    name: file.name, type: file.mimeType, uri: file.uri,
-                })
-            }
+        if (file.fileData) {
+            formData.append('file', file.fileData)
+        } else {
+            formData.append('file', {
+                //@ts-ignore
+                name: file.fileName, type: file.fileType, uri: file.file,
+            })
         }
 
-        const response = await axiosInstance.post(`chat/${chatId}/files/`, formData, {
+        const response = await axiosInstance.post<IFile>(`chat/${chatId}/files/`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }

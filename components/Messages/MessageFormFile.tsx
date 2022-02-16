@@ -1,5 +1,5 @@
-import React from 'react'
-import {ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import React, {useEffect, useState} from 'react'
+import {Animated, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {FileType, isFileTypeImage} from '../../types/file-types'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FeatherIcon from 'react-native-vector-icons/Feather'
@@ -22,12 +22,27 @@ const MessageFormFile: React.FC<Props> = (props) => {
         }
     }
 
-    return <TouchableOpacity style={styles.container} onPress={showFile}>
+    //TODO another animation
+    const [shakeAnimation, setShakeAnimation] = useState(new Animated.Value(0))
+    const startShake = () => {
+        Animated.sequence([
+            Animated.timing(shakeAnimation, { toValue: 3, duration: 100, useNativeDriver: true }),
+            Animated.timing(shakeAnimation, { toValue: -3, duration: 100, useNativeDriver: true }),
+            Animated.timing(shakeAnimation, { toValue: 3, duration: 100, useNativeDriver: true }),
+            Animated.timing(shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
+        ]).start();
+    }
+
+    useEffect(() => {
+        startShake()
+    }, [])
+
+    return <Animated.View style={[styles.container, { transform: [{translateX: shakeAnimation}] }]} >
         {isImage
             ?
-            <View style={styles.imageContainer}>
+            <TouchableOpacity style={styles.imageContainer} onPress={showFile}>
                 <ImageBackground style={styles.image} source={{uri: props.uri}}/>
-            </View>
+            </TouchableOpacity>
             :
             <File uri={props.uri} name={props.name} showingDisabled={true}/>
         }
@@ -37,7 +52,7 @@ const MessageFormFile: React.FC<Props> = (props) => {
         >
             <Ionicons name={'close'} size={22} color={'#ffffff'}/>
         </TouchableOpacity>
-    </TouchableOpacity>
+    </Animated.View>
 }
 
 const styles = StyleSheet.create({

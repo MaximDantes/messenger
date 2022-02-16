@@ -1,8 +1,5 @@
 import React from 'react'
 import {Dimensions, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-
-//TODO image path
-//@ts-ignore
 import defaultAvatar from '../../assets/default-avatar.png'
 import * as DocumentPicker from 'expo-document-picker'
 import {DocumentResult} from 'expo-document-picker'
@@ -69,6 +66,10 @@ const styles = StyleSheet.create({
     frameText: {
         color: '#dddddd',
         fontSize: 22,
+        padding: 5,
+        textShadowColor: '#000000',
+        textShadowOffset: {width: 0, height: 0},
+        textShadowRadius: 10
     }
 })
 

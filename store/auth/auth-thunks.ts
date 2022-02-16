@@ -1,5 +1,11 @@
 import authApi from '../../api/auth-api'
-import {authorized, fetchingFinished, fetchingStarted, tokenReceived} from './auth-actions'
+import {
+    authorized,
+    errorStateChanged,
+    fetchingStateChanged,
+    logoutSucceed,
+    tokenReceived
+} from './auth-actions'
 import {Thunk} from './auth-reducer'
 import {getProfile} from '../profile/profile-thunks'
 import {statusCodes} from '../../types/status-codes'
@@ -16,30 +22,50 @@ export const auth = (email: string, password: string): Thunk => async (dispatch)
         dispatch(tokenReceived(response.access))
 
         dispatch(startMessagesListening())
+
+        dispatch(errorStateChanged(false))
     } catch (e) {
-        console.error(e.message)
+        console.error('auth', e)
+        dispatch(errorStateChanged(true))
+    }
+}
 
-        dispatch(authorized(false))
+export const logout = (): Thunk => async (dispatch) => {
+    try {
+        dispatch(fetchingStateChanged(true))
 
-        dispatch(tokenReceived(''))
+        const response = await authApi.logout()
+
+        if (response.status === statusCodes.success) {
+            dispatch(logoutSucceed())
+        }
+    } catch (e) {
+        console.error('logout', e)
+    } finally {
+        dispatch(fetchingStateChanged(false))
     }
 }
 
 export const refreshToken = (): Thunk => async (dispatch) => {
-    const response = await authApi.refreshToken()
+    try {
+        dispatch(fetchingStateChanged(true))
 
-    if (response.status === statusCodes.success) {
-        dispatch(authorized(true))
-        dispatch(tokenReceived(response.data.access))
-    } else {
-        dispatch(authorized(false))
-        dispatch(tokenReceived(''))
+        const response = await authApi.refreshToken()
+
+        if (response.status === statusCodes.success) {
+            dispatch(authorized(true))
+            dispatch(tokenReceived(response.data.access))
+        }
+    } catch (e) {
+        console.error('refresh token', e)
+    } finally {
+        dispatch(fetchingStateChanged(false))
     }
 }
 
 export const checkAuth = (): Thunk => async (dispatch) => {
     try {
-        dispatch(fetchingStarted())
+        dispatch(fetchingStateChanged(true))
 
         const response = await authApi.refreshToken()
 
@@ -50,9 +76,8 @@ export const checkAuth = (): Thunk => async (dispatch) => {
             dispatch(startMessagesListening())
         }
     } catch (e) {
-        console.error(e)
+        console.error('check auth', e)
     } finally {
-        dispatch(fetchingFinished())
+        dispatch(fetchingStateChanged(false))
     }
-
 }

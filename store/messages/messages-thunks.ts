@@ -1,7 +1,7 @@
 import {Thunk} from './messages-reducer'
 import websocketApi from '../../api/websocket-api'
 import {IMessage, IFile} from '../../types/entities'
-import {fetchingChanged, messageReceived, messageSent, messagesReceived} from './messages-actions'
+import {fetchingChanged, messageDeleted, messageReceived, messageSent, messagesReceived} from './messages-actions'
 import {DocumentResult} from 'expo-document-picker'
 import messagesApi from '../../api/messages-api'
 import {Dispatch} from 'redux'
@@ -10,7 +10,6 @@ import {setCursors} from '../chats/chats-thunks'
 import store from '../store'
 
 let _newMessageHandler: ((message: IMessage) => void) | null = null
-
 const newMessageHandlerCreator = (dispatch: Dispatch) => {
     const handler = (message: IMessage) => {
         dispatch(messageReceived(message))
@@ -20,73 +19,87 @@ const newMessageHandlerCreator = (dispatch: Dispatch) => {
     return _newMessageHandler || handler
 }
 
-export const startMessagesListening = (): Thunk => async (dispatch) => {
-    websocketApi.subscribe(newMessageHandlerCreator(dispatch))
-}
-
-export const sendMessage = (message: string, chatId: number, userId: number, files: DocumentResult[]):
-    Thunk => async (dispatch) => {
-
-    const clientSideId = store.getState().messages.clientSideId
-
-    const preloadFiles: IFile[] = []
-
-    files.map((item, index) => {
-        if (item.type === 'success') {
-            preloadFiles.push({
-                id: index,
-                file: item.uri,
-                fileName: item.name,
-                fileType: item.mimeType
-            })
-        }
-    })
-
-    const profile = store.getState().profile.profile
-    profile && dispatch(messageSent({
-        id: clientSideId,
-        text: message,
-        chatId: chatId,
-        user: {
-            id: profile.id,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            avatar: profile.avatar,
-        },
-        date: new Date(),
-        files: preloadFiles,
-        inSending: true,
-    }))
-
-    //TODO parallel files load
-    const getFilesId = async () => {
-        const filesId: string[] = []
-
-        if (files.length > 0) {
-            for (const item of files) {
-                const response = await messagesApi.sendFile(chatId, item)
-
-                filesId.push(String(response.id))
-            }
-        }
-
-        return filesId
+let _deleteMessageHandler: ((id: number) => void) | null = null
+const deleteMessageHandlerCreator = (dispatch: Dispatch) => {
+    const handler = (id: number) => {
+        //TODO delete immediately
+        dispatch(messageDeleted(id))
     }
 
-    const filesId = await getFilesId()
-
-    websocketApi.send(message, chatId, clientSideId, filesId)
+    return _deleteMessageHandler || handler
 }
 
+export const startMessagesListening = (): Thunk => async (dispatch) => {
+    websocketApi.subscribeOnSend(newMessageHandlerCreator(dispatch))
+    websocketApi.subscribeOnDelete(deleteMessageHandlerCreator(dispatch))
+}
+
+export const sendMessage = (message: string, chatId: number, userId: number, files: IFile[]): Thunk =>
+    async (dispatch) => {
+        try {
+            const clientSideId = store.getState().messages.clientSideId
+
+            const preloadFiles: IFile[] = []
+
+            files.map(item => preloadFiles.push(item))
+
+            const profile = store.getState().profile.profile
+            profile && dispatch(messageSent({
+                id: clientSideId,
+                text: message,
+                chatId: chatId,
+                user: {
+                    id: profile.id,
+                    firstName: profile.firstName,
+                    lastName: profile.lastName,
+                    avatar: profile.avatar,
+                },
+                date: new Date(),
+                files: preloadFiles,
+                inSending: true,
+            }))
+
+            const getFilesId = async () => {
+                const requests: Promise<string>[] = []
+
+                files.forEach(item => {
+                    requests.push(messagesApi.sendFile(chatId, item).then(response => String(response.id)))
+                })
+
+                return await Promise.all<string>(requests)
+            }
+
+            const filesId = await getFilesId()
+
+            websocketApi.send(message, chatId, clientSideId, filesId)
+        } catch (e) {
+            console.error('send message', e)
+        }
+    }
+
+export const removeMessage = (id: number): Thunk => async (dispatch) => {
+    websocketApi.remove(id)
+}
+
+export const editMessage = (id: number, chatId: number, text: string, files: Array<DocumentResult | number>): Thunk =>
+    async (dispatch) => {
+
+        //TODO edit request
+    }
+
 export const getChatMessages = (chatId: number): Thunk => async (dispatch) => {
-    dispatch(fetchingChanged(true))
+    try {
+        dispatch(fetchingChanged(true))
 
-    const cursor = store.getState().chats.chats.find(item => item.id === chatId)?.nextMessagesCursor
+        const cursor = store.getState().chats.chats.find(item => item.id === chatId)?.nextMessagesCursor
 
-    const result = await messagesApi.get(chatId, cursor)
+        const result = await messagesApi.get(chatId, cursor)
 
-    dispatch(messagesReceived(result.results))
-    dispatch(setCursors({nextMessages: result.next || ''}, chatId))
+        dispatch(messagesReceived(result.results))
+        dispatch(setCursors({nextMessages: result.next || ''}, chatId))
 
-    dispatch(fetchingChanged(false))
+        dispatch(fetchingChanged(false))
+    } catch (e) {
+        console.error('get chat messages', e)
+    }
 }

@@ -5,6 +5,8 @@ import chatsReducer from './chats/chats-reducer'
 import profileReducer from './profile/profile-reducer'
 import messagesReducer from './messages/messages-reducer'
 import filesReducer from './files/files-reducer'
+import specialitiesReducer from './specialities/specialities-reducer'
+import articlesReducer from './articles/articles-reducer'
 
 const rootReducer = combineReducers({
     auth: authReducer,
@@ -12,6 +14,8 @@ const rootReducer = combineReducers({
     chats: chatsReducer,
     messages: messagesReducer,
     files: filesReducer,
+    specialities: specialitiesReducer,
+    articles: articlesReducer,
 })
 
 declare global {

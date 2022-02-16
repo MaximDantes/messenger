@@ -4,7 +4,8 @@ import {IFile} from '../../types/entities'
 import excludeSameId from '../../utilits/exclude-same-id'
 
 const initialState = {
-    files: [] as IFile[]
+    files: [] as IFile[],
+    isFetching: false
 }
 
 const filesReducer = (state = initialState, action: Action): typeof initialState => {
@@ -13,6 +14,12 @@ const filesReducer = (state = initialState, action: Action): typeof initialState
             return {
                 ...state,
                 files: excludeSameId([...state.files, ...action.payload])
+            }
+
+        case 'files/FETCHING_STATE_CHANGED':
+            return {
+                ...state,
+                isFetching: action.payload
             }
 
         default:

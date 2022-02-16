@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import {StyleSheet, Text, TouchableOpacity} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 import {getFileType, isFileTypeOpenable} from '../../types/file-types'
 import {downloadFile} from '../../utilits/download-file'
-import {StackNavigationProps} from '../../Main'
+import {NavigationProps} from '../../types/screens'
+import {Animated} from 'react-native'
 
 
 type Props = {
@@ -19,7 +20,7 @@ const File: React.FC<Props> = (props) => {
 
     const newFileName = (name.length < 30) ? name : name.slice(0, 10) + '...' + name.slice(-10)
 
-    const navigator = useNavigation<StackNavigationProps>()
+    const navigator = useNavigation<NavigationProps>()
 
     const onPress = async () => {
         if (isFileTypeOpenable(getFileType(props.uri))) {
@@ -34,8 +35,8 @@ const File: React.FC<Props> = (props) => {
     }
 
     return <TouchableOpacity
-        style={styles.container}
         onPress={onPress}
+        style={styles.container}
     >
         <FeatherIcon name={'file-text'} size={30} color={'#ffffff'}/>
         <Text style={styles.text}>{newFileName}</Text>

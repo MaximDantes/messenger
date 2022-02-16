@@ -24,6 +24,12 @@ const messagesReducer = (state = initialState, action: Action): typeof initialSt
                     .filter(item => item.id !== action.payload.clientSideId)
             }
 
+        case 'messages/MESSAGE_DELETED':
+            return {
+                ...state,
+                messages: state.messages.filter(item => item.id !== action.payload)
+            }
+
         case 'messages/MESSAGES_RECEIVED':
             return {
                 ...state,

@@ -1,36 +1,54 @@
-import {ScrollView, StyleSheet, TextInput, TouchableOpacity, View} from 'react-native'
-import React, {useState} from 'react'
+import {Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import * as DocumentPicker from 'expo-document-picker'
-import {DocumentResult} from 'expo-document-picker'
 import MessageFormFile from './MessageFormFile'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import {useNavigation} from '@react-navigation/native'
-import {StackNavigationProps} from '../../Main'
 import {isFileTypeImage} from '../../types/file-types'
 import {selectProfile} from '../../selectors/profile-selectors'
 import {sendMessage} from '../../store/messages/messages-thunks'
+import {NavigationProps} from '../../types/screens'
+import {IFile, IMessage} from '../../types/entities'
 
 type Props = {
     chatId: number
+    editedMessage: IMessage | null
+    toggleEditMode(): void
 }
 
 const MessageForm: React.FC<Props> = (props) => {
     const dispatch = useDispatch()
-    const navigation = useNavigation<StackNavigationProps>()
+    const navigation = useNavigation<NavigationProps>()
 
     const [message, setMessage] = useState('')
-    const [files, setFiles] = useState<DocumentResult[]>([])
+    const [files, setFiles] = useState<IFile[]>([])
 
     const user = useSelector(selectProfile)
 
-    const send = () => {
-        if (user && (message.trim() || files.length > 0)) {
-            dispatch(sendMessage(message.trim(), props.chatId, user.id, files))
-
+    useEffect(() => {
+        if (props.editedMessage) {
+            setMessage(props.editedMessage.text)
+            setFiles(props.editedMessage.files)
+        } else {
             setMessage('')
             setFiles([])
+        }
+
+    }, [props.editedMessage])
+
+    const send = () => {
+        if (!props.editedMessage) {
+            if (user && (message.trim() || files.length > 0)) {
+                dispatch(sendMessage(message.trim(), props.chatId, user.id, files))
+
+                setMessage('')
+                setFiles([])
+            }
+        } else {
+            Alert.alert('message edited: ' + message, ' files count: ' + files.length)
+            props.toggleEditMode()
         }
     }
 
@@ -38,20 +56,26 @@ const MessageForm: React.FC<Props> = (props) => {
         const file = await DocumentPicker.getDocumentAsync()
 
         if (file.type === 'success') {
-            setFiles([...files, file])
+            setFiles([...files, {
+                file: file.uri,
+                fileName: file.name,
+                fileType: file.mimeType,
+                fileSize: file.size,
+                fileData: file.file,
+            }])
         }
     }
 
-    const removeFile = (file: DocumentResult) => {
+    const removeFile = (file: IFile) => {
         setFiles(files.filter(item => item !== file))
     }
 
     const showFile = (position: number) => {
-        //TODO not image position
         const images: string[] = []
+
         files.map(item => {
-            if (item.type === 'success' && isFileTypeImage(item.mimeType)) {
-                images.push(item.uri)
+            if (isFileTypeImage(item.fileType)) {
+                images.push(item.file)
             }
         })
 
@@ -60,25 +84,45 @@ const MessageForm: React.FC<Props> = (props) => {
         })
     }
 
-    return <View style={styles.container}>
-        <ScrollView horizontal={true}>
-            {files.map((item, index) => (
-                (item.type === 'success') &&
-                <MessageFormFile
-                    key={item.name + index}
-                    uri={item.uri}
-                    name={item.name}
-                    type={item.mimeType || 'unknown'}
+    const renderItems = () => {
+        let imagesIndex = -1
+
+        return files.map((item, index) => {
+                if (isFileTypeImage(item.fileType)) {
+                    imagesIndex++
+                }
+
+                const fileIndex = imagesIndex
+
+                return <MessageFormFile
+                    key={(item.fileName || '') + index}
+                    uri={item.file}
+                    name={item.fileName || ''}
+                    type={item.fileType || 'unknown'}
                     removeFile={() => removeFile(item)}
-                    showFile={() => showFile(index)}
+                    showFile={() => showFile(fileIndex)}
                 />
-            ))}
+            }
+        )
+    }
+
+    return <View style={styles.container}>
+        {!!props.editedMessage && <View style={styles.editContainer}>
+            <Text>Редактирование сообщения</Text>
+            <TouchableOpacity onPress={props.toggleEditMode}>
+                <MaterialIcon name={'close'} color={'#666666'} size={22}/>
+            </TouchableOpacity>
+        </View>}
+
+        <ScrollView horizontal={true}>
+            {renderItems()}
         </ScrollView>
 
         <View style={styles.messageContainer}>
             <TouchableOpacity onPress={pickFile}>
                 <MaterialIcon name={'push-pin'} color={'#2196F3'} size={22}/>
             </TouchableOpacity>
+
             <TextInput
                 style={styles.input}
                 value={message}
@@ -88,6 +132,7 @@ const MessageForm: React.FC<Props> = (props) => {
                 onChangeText={setMessage}
                 placeholder={'Сообщение...'}
             />
+
             <TouchableOpacity onPress={send}>
                 <Ionicons name={'send'} color={'#2196F3'} size={22}/>
             </TouchableOpacity>
@@ -112,6 +157,13 @@ const styles = StyleSheet.create({
     input: {
         flex: 1,
         marginHorizontal: 7,
+    },
+
+    editContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 5,
     }
 })
 

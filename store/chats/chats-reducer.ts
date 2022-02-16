@@ -7,33 +7,12 @@ const initialState = {
 
 }
 
-const sortByDate = (chats: IChat[]) => {
-    //TODO refactor date
-
-    return chats.sort((prev, next) => {
-        let prevDate: number
-        let nextDate: number
-        try {
-            prevDate = prev.lastMessage?.date?.getDate() || Infinity
-        } catch {
-            prevDate = Infinity
-        }
-        try {
-            nextDate = next.lastMessage?.date?.getDate() || Infinity
-        } catch {
-            nextDate = Infinity
-        }
-
-        return prevDate - nextDate
-    })
-}
-
 const chatsReducer = (state = initialState, action: Action): typeof initialState => {
     switch (action.type) {
         case 'chats/CHATS_RECEIVED':
             return {
                 ...state,
-                chats: sortByDate(action.payload)
+                chats: action.payload
             }
 
         case 'chats/CURSORS_CHANGED': {
@@ -63,8 +42,6 @@ const chatsReducer = (state = initialState, action: Action): typeof initialState
         case 'chats/LAST_MESSAGE_CHANGED': {
             const chat = state.chats.find(item => item.id === action.payload.chatId)
 
-            //TODO set user avatar
-
             if (chat) {
                 const newChat: IChat = {
                     ...chat,
@@ -73,14 +50,14 @@ const chatsReducer = (state = initialState, action: Action): typeof initialState
                         text: action.payload.text,
                         date: action.payload.date,
                         user: {
-                            avatar: ''
+                            avatar: action.payload.user.avatar
                         }
                     }
                 }
 
                 return {
                     ...state,
-                    chats: sortByDate([...state.chats.filter(item => item.id !== action.payload.chatId), newChat])
+                    chats: [...state.chats.filter(item => item.id !== action.payload.chatId), newChat]
                 }
             }
 

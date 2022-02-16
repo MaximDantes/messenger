@@ -9,7 +9,7 @@ export const getChats = (userId: number): Thunk => async (dispatch) => {
 
         dispatch(chatsReceived(response))
     } catch (e) {
-        console.error(e)
+        console.error('get chats', e)
     }
 }
 

@@ -12,6 +12,7 @@ export interface IChat {
         }
     } | null
     readonly cover: string | null
+    readonly members: IUser[]
     readonly nextMessagesCursor: string
     readonly previousMessagesCursor: string
     readonly nextFilesCursor: string
@@ -46,19 +47,41 @@ export interface IProfile {
     readonly lastName: string
     readonly email: string
     readonly avatar: string
+    readonly specialityId: number
+    readonly courseId: number
+}
+
+export interface IUser {
+    readonly id: number
+    readonly email: string
+    readonly phone: string
+    readonly firstName: string
+    readonly lastName: string
+    readonly avatar: string
 }
 
 export interface IFile {
-    readonly id: number
+    readonly id?: number
     readonly file: string
     readonly fileName?: string
     readonly fileSize?: number
     readonly fileType?: FileType
     readonly chatId?: number
+    readonly fileData?: File
+    readonly isUploaded?: boolean
 }
 
 export interface IArticle {
-    title: string
-    description: string
-    files: IFile[]
+    readonly id: number
+    readonly title: string
+    readonly description: string
+    readonly files: IFile[]
+    readonly specialityId: number
+    readonly courseId: number
+    readonly teacherId: number
+}
+
+export interface ISpeciality {
+    readonly id: number,
+    readonly abbreviation: string
 }

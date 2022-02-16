@@ -9,16 +9,23 @@ const profileApi = {
         const response = await axiosInstance.get<IProfile>('users/me')
 
         return {
-            data: snakeToCamel<IProfile>(response.data),
+            data: {
+                ...snakeToCamel<IProfile>(response.data),
+                courseId: 1,
+                specialityId: 1,
+            } as IProfile,
             status: response.status
         }
     },
 
-    edit: async (profile: IProfile) => {
-        const response = await axiosInstance.get<IProfile>('users/profile')
+    edit: async (firstName: string, lastName: string) => {
+        const response = await axiosInstance.patch('users/me/', {
+            first_name: firstName,
+            last_name: lastName
+        })
 
         return {
-            data: snakeToCamel<IProfile>(response.data),
+            data: snakeToCamel<{ firstName: string, lastName: string }>(response.data),
             status: response.status
         }
     },
@@ -39,9 +46,18 @@ const profileApi = {
             }
         }
 
-        const response = await axiosInstance.post<{avatar: string}>('users/me/avatar/ну ', formData)
+        const response = await axiosInstance.post<{ avatar: string }>('users/me/avatar/', formData)
 
-        return response.data.avatar
+        return response
+    },
+
+    changePassword: async (oldPassword: string, newPassword: string) => {
+        const response = await axiosInstance.patch('users/me/password/', {
+            old_password: oldPassword,
+            new_password: newPassword
+        })
+
+        return response
     }
 }
 

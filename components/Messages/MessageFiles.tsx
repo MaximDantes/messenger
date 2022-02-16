@@ -1,10 +1,10 @@
 import {StyleSheet, View} from 'react-native'
 import {IFile} from '../../types/entities'
 import React from 'react'
-import {getFileName, getFileType, isFileTypeImage} from '../../types/file-types'
+import {isFileTypeImage} from '../../types/file-types'
 import MessageFile from './MessageFile'
 import {useNavigation} from '@react-navigation/native'
-import {StackNavigationProps} from '../../Main'
+import {NavigationProps} from '../../types/screens'
 
 type Props = {
     files: IFile[]
@@ -13,14 +13,14 @@ type Props = {
 const MessageFiles: React.FC<Props> = (props) => {
     const images = props.files.filter(item => isFileTypeImage(item.fileType))
 
-    const navigator = useNavigation<StackNavigationProps>()
+    const navigator = useNavigation<NavigationProps>()
 
     const showImages = (position: number) => {
         navigator.navigate('Images', {position, images: images.map(item => item.file)})
     }
 
     const showFile = (file: IFile) => {
-        navigator.navigate('Documents', {file})
+        navigator.navigate('Documents', {uri: file.file, name: file.fileName})
     }
 
     const renderItems = () => {
@@ -34,7 +34,7 @@ const MessageFiles: React.FC<Props> = (props) => {
             const fileIndex = imagesIndex
 
             return <MessageFile
-                key={item.id}
+                key={item.id || item.file + index}
                 file={item}
                 variant={index > 1 ? 'small' : 'large'}
                 showImages={() => showImages(fileIndex)}

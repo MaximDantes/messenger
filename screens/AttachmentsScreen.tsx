@@ -1,10 +1,9 @@
 import React from 'react'
-import {RouteProp} from '@react-navigation/native'
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import Attachments from '../components/Attachments/Attachments'
-import {ScreenProps} from '../types/screens'
+import {AttachmentsNavigatorParamList, ScreenProps} from '../types/screens'
 
-const Tab = createBottomTabNavigator<TabNavigatorParamList>()
+const Tab = createBottomTabNavigator<AttachmentsNavigatorParamList>()
 
 const AttachmentsScreen: React.FC<ScreenProps<'Attachments'>> = (props) => {
     const chatId = props.route.params.id
@@ -34,7 +33,3 @@ const AttachmentsScreen: React.FC<ScreenProps<'Attachments'>> = (props) => {
 export default AttachmentsScreen
 
 //TODO move to types folder
-export type TabNavigatorParamList = {
-    FilesAttachments: { chatId: number, type: 'IMG' | 'DOC' }
-    ImagesAttachments: { chatId: number, type: 'IMG' | 'DOC' }
-}

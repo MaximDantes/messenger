@@ -12,19 +12,33 @@ const profileReducer = (state = initialState, action: Action): typeof initialSta
         case 'profile/PROFILE_RECEIVED':
             return {
                 ...state,
-                profile: action.payload
+                profile: action.payload,
             }
 
-        case 'profile/FETCHING_STARTED':
+        case 'profile/PROFILE_EDITED':
             return {
                 ...state,
-                isFetching: true
+                profile: state.profile ? {
+                    ...state.profile,
+                    firstName: action.payload.firstName,
+                    lastName: action.payload.lastName,
+                } : null
             }
 
-        case 'profile/FETCHING_FINISHED':
+        case 'profile/AVATAR_EDITED':
+            console.log(action.payload)
             return {
                 ...state,
-                isFetching: false
+                profile: state.profile ? {
+                    ...state.profile,
+                    avatar: action.payload
+                } : null
+            }
+
+        case 'profile/FETCHING_STATE_CHANGED':
+            return {
+                ...state,
+                isFetching: action.payload
             }
 
         default:

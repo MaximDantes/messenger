@@ -1,4 +1,5 @@
 import {
+    Alert,
     Button,
     Image, KeyboardAvoidingView,
     NativeScrollEvent,
@@ -11,16 +12,19 @@ import {
 } from 'react-native'
 import Message from './Message'
 import React, {useEffect, useRef} from 'react'
-import {getChatMessages} from '../../store/messages/messages-thunks'
+import {getChatMessages, removeMessage} from '../../store/messages/messages-thunks'
 import {useDispatch, useSelector} from 'react-redux'
 import {State} from '../../store/store'
 import {selectChatMessages, selectMessagesFetching} from '../../selectors/messages-selectors'
 import {selectProfile} from '../../selectors/profile-selectors'
-import {IChat} from '../../types/entities'
+import {IChat, IMessage} from '../../types/entities'
 import {getMonthName, isToday, isYesterday} from '../../utilits/format-date'
+import message from './Message'
+import {Preloader} from '../common/Preloader'
 
 type Props = {
     chat: IChat
+    toggleChangeMode(message?: IMessage, remove?: () => void): void
 }
 
 const MessagesContainer: React.FC<Props> = (props) => {
@@ -34,7 +38,7 @@ const MessagesContainer: React.FC<Props> = (props) => {
         scrollView.current?.scrollToEnd()
     }, [messages[messages.length - 1]])
 
-    const scrollView = useRef<ScrollView>()
+    const scrollView = useRef<ScrollView>(null)
 
     const scrollContentSize = useRef(0)
 
@@ -62,48 +66,62 @@ const MessagesContainer: React.FC<Props> = (props) => {
         }
     }
 
-    return <ScrollView
-        style={styles.container}
-        //TODO remove ts-ignore
-        //@ts-ignore
-        ref={scrollView}
-        contentOffset={{y: 0, x: 0}}
-        onScrollEndDrag={onTopReached}
-        onScroll={setScrollPosition}
-        onContentSizeChange={onContentSizeChange}
-        onLayout={() => scrollView.current?.scrollToEnd({animated: false})}
-    >
-        {Platform.OS === 'web' && <Button title={'more'} onPress={loadPreviousMessages}/>}
+    const onMessageRemove = (id: number) => {
+        dispatch(removeMessage(id))
+        props.toggleChangeMode()
+    }
 
-        {isReceivingMessages && <Text>Загрузка сообщений</Text>}
+    const changeMessage = (message: IMessage) => {
+        props.toggleChangeMode(message, () => onMessageRemove(message.id))
+    }
 
-        {messages.map((item, index, array) => (
-            <View key={item.id}>
-                {item.date.getDate() !== array[index - 1]?.date.getDate() &&
-                    <View style={styles.dateContainer}>
-                        <Text style={styles.date}>
-                            {isToday(item.date) ? 'Сегодня' :
-                                isYesterday(item.date) ? 'Вчера' :
-                                    item.date.getDate() + ' ' + getMonthName(item.date.getMonth())}
-                        </Text>
-                    </View>
-                }
-                {item.user.id !== array[index - 1]?.user.id && item.user.id !== profile?.id &&
-                    <View style={styles.userContainer}>
-                        <Image source={{uri: item.user.avatar}} style={styles.userAvatar}/>
-                        <Text>{item.user.firstName + ' ' + item.user.lastName}</Text>
-                    </View>
-                }
-                <Message
-                    text={item.text}
-                    time={item.date}
-                    files={item.files}
-                    inSending={item.inSending || false}
-                    sentByCurrentUser={item.user.id === profile?.id}
-                />
-            </View>
-        ))}
-    </ScrollView>
+    return (isReceivingMessages && messages.length === 0) ?
+
+        <Preloader/>
+
+        :
+        <ScrollView
+            style={styles.container}
+            ref={scrollView}
+            contentOffset={{y: 0, x: 0}}
+            onScrollEndDrag={onTopReached}
+            onScroll={setScrollPosition}
+            scrollEventThrottle={50}
+            onContentSizeChange={onContentSizeChange}
+            onLayout={() => scrollView.current?.scrollToEnd({animated: false})}
+        >
+            {Platform.OS === 'web' && <Button title={'more'} onPress={loadPreviousMessages}/>}
+
+            {isReceivingMessages && <Text>Загрузка сообщений</Text>}
+
+            {messages.map((item, index, array) => (
+                <View key={item.id}>
+                    {item.date.getDate() !== array[index - 1]?.date.getDate() &&
+                        <View style={styles.dateContainer}>
+                            <Text style={styles.date}>
+                                {isToday(item.date) ? 'Сегодня' :
+                                    isYesterday(item.date) ? 'Вчера' :
+                                        item.date.getDate() + ' ' + getMonthName(item.date.getMonth())}
+                            </Text>
+                        </View>
+                    }
+                    {item.user.id !== array[index - 1]?.user.id && item.user.id !== profile?.id &&
+                        <View style={styles.userContainer}>
+                            <Image source={{uri: item.user.avatar}} style={styles.userAvatar}/>
+                            <Text>{item.user.firstName + ' ' + item.user.lastName}</Text>
+                        </View>
+                    }
+                    <Message
+                        text={item.text}
+                        time={item.date}
+                        files={item.files}
+                        inSending={item.inSending || false}
+                        sentByCurrentUser={item.user.id === profile?.id}
+                        change={() => changeMessage(item)}
+                    />
+                </View>
+            ))}
+        </ScrollView>
 }
 
 const styles = StyleSheet.create({

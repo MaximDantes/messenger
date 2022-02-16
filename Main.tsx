@@ -1,24 +1,27 @@
-import {NavigationContainer, RouteProp} from '@react-navigation/native'
+import {NavigationContainer} from '@react-navigation/native'
 import React, {useEffect} from 'react'
 import LibraryScreen from './screens/LibraryScreen'
 import {useDispatch, useSelector} from 'react-redux'
-import {auth, checkAuth} from './store/auth/auth-thunks'
+import {checkAuth} from './store/auth/auth-thunks'
 import ProfileScreen from './screens/ProfileScreen'
-import {BottomTabNavigationProp, createBottomTabNavigator} from '@react-navigation/bottom-tabs'
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import EntypoIcon from 'react-native-vector-icons/Entypo'
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import AuthScreen from './screens/AuthScreen'
 import {selectAuthFetching, selectIsAuth} from './selectors/auth-selectors'
 import ChatsScreen from './screens/ChatsScreen'
-import {createNativeStackNavigator, NativeStackNavigationProp} from '@react-navigation/native-stack'
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import MessagesScreen from './screens/MessagesScreen'
 import DocumentsScreen from './screens/DocumentsScreen'
 import {Preloader} from './components/common/Preloader'
 import ImagesScreen from './screens/ImagesScreen'
 import AttachmentsScreen from './screens/AttachmentsScreen'
-import {IArticle, IFile} from './types/entities'
-import {Alert} from 'react-native'
 import ArticleScreen from './screens/ArticleScreen'
 import {StackNavigatorParamList, TabNavigatorParamList} from './types/screens'
+import LibrarySpecialityScreen from './screens/LibrarySpecialityScreen'
+import MembersScreen from './screens/MembersScreen'
+import ChangePasswordScreen from './screens/ChangePasswordScreen'
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>()
 const Stack = createNativeStackNavigator<StackNavigatorParamList>()
@@ -27,22 +30,16 @@ const MainNavigation: React.FC = () => {
     return <Tab.Navigator
         screenOptions={({route}) => ({
             tabBarIcon: ({focused, color, size}) => {
-                let iconName
-
                 switch (route.name) {
                     case 'Profile':
-                        iconName = 'people'
-                        break
+                        return <Ionicons name={'people'} size={size} color={color}/>
 
                     case 'Chats':
-                        iconName = 'people'
-                        break
+                        return <EntypoIcon name={'chat'} size={size} color={color}/>
 
                     default:
-                        iconName = 'book'
+                        return <MaterialIcon name={'library-books'} size={size} color={color}/>
                 }
-
-                return <Ionicons name={iconName} size={size} color={color}/>
             },
         })}
     >
@@ -82,7 +79,14 @@ const Main: React.FC = () => {
 
             :
 
-            <Stack.Navigator>
+            //TODO remove header padding
+            <Stack.Navigator
+                screenOptions={{
+                    gestureEnabled: true,
+                    animation: 'default',
+                    presentation: 'modal',
+                }}
+            >
                 {isAuth ?
                     <>
                         <Stack.Screen
@@ -111,6 +115,21 @@ const Main: React.FC = () => {
                         <Stack.Screen
                             name={'Article'}
                             component={ArticleScreen}
+                        />
+                        <Stack.Screen
+                            name={'LibrarySpeciality'}
+                            component={LibrarySpecialityScreen}
+                        />
+                        <Stack.Screen
+                            name={'Members'}
+                            component={MembersScreen}
+                        />
+                        <Stack.Screen
+                            options={{
+                                title: 'Изменение пароля'
+                            }}
+                            name={'ChangePassword'}
+                            component={ChangePasswordScreen}
                         />
                     </>
 

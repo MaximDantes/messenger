@@ -21,7 +21,7 @@ export const isYesterday = (date: Date) => {
         date.getFullYear() === today.getFullYear()
 }
 
-export const formatDate = (obj: any) => {
+export const formatDate = <T>(obj: any): T => {
     for (const key in obj) {
         if (typeof obj[key] === 'object') {
             formatDate(obj[key])
@@ -33,4 +33,22 @@ export const formatDate = (obj: any) => {
     }
 
     return obj
+}
+
+export const getPrintTimeFormat = (time: Date) => {
+    let hours = (time.getHours() >= 10) ? time.getHours() : `0${time.getHours()}`
+    let minutes = (time.getMinutes() >= 10) ? time.getMinutes() : `0${time.getMinutes()}`
+
+    return hours + ':' + minutes
+}
+
+export const dateTimeReviver = (key: string, value: any) => {
+    let regex
+    if (typeof value === 'string') {
+        regex = /\/Date\((\d*)\)\//.exec(value)
+        if (regex) {
+            return new Date(+regex[1])
+        }
+    }
+    return value
 }

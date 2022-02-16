@@ -1,6 +1,9 @@
 import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import React from 'react'
 import {IChat} from '../../types/entities'
+import {useSelector} from 'react-redux'
+import {selectProfile} from '../../selectors/profile-selectors'
+import {getPrintTimeFormat} from '../../utilits/format-date'
 
 type Props = {
     chat: IChat
@@ -8,6 +11,22 @@ type Props = {
 }
 
 const Chat: React.FC<Props> = (props) => {
+    let lastMessageText = ''
+    let isLastMessageContainsFiles = false
+
+    if (props.chat.lastMessage) {
+        if (props.chat.lastMessage.text) {
+            lastMessageText = props.chat.lastMessage.text
+            isLastMessageContainsFiles = false
+
+            lastMessageText = lastMessageText.length < 30 ? lastMessageText :
+                lastMessageText.slice(0, 27) + '...'
+        } else {
+            lastMessageText = 'Файлы'
+            isLastMessageContainsFiles = true
+        }
+    }
+
     return <TouchableOpacity
         onPress={() => props.onPress(props.chat.id)}
         style={styles.container}
@@ -15,8 +34,19 @@ const Chat: React.FC<Props> = (props) => {
         {props.chat.cover && <ImageBackground source={{uri: props.chat.cover}} style={styles.image}/>}
 
         <View style={styles.textContainer}>
-            <Text style={styles.title}>{props.chat.title}</Text>
-            <Text style={styles.text}>{props.chat.lastMessage?.text}</Text>
+            <Text style={styles.text}>{props.chat.title}</Text>
+
+            <View style={styles.lastMessageDateContainer}>
+                <View style={styles.lastMessageContainer}>
+                    {!!props.chat.lastMessage?.user.avatar &&
+                        <Image style={styles.avatar} source={{uri: props.chat.lastMessage.user.avatar}}/>}
+
+                    <Text style={isLastMessageContainsFiles ? styles.files : styles.text}>{lastMessageText}</Text>
+                </View>
+
+                {!!props.chat.lastMessage?.date &&
+                    <Text style={styles.text}>{getPrintTimeFormat(props.chat.lastMessage.date)}</Text>}
+            </View>
         </View>
     </TouchableOpacity>
 }
@@ -35,19 +65,40 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
     },
 
+    lastMessageContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+
+    lastMessageDateContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+
     title: {
         color: '#000',
     },
 
     text: {
-        flex: 1,
         color: '#000',
-        justifyContent: 'center',
+    },
+
+    files: {
+        color: '#00f',
     },
 
     image: {
         width: 50,
         height: 50,
+    },
+
+    avatar: {
+        width: 26,
+        height: 26,
+        borderRadius: 13,
+        marginRight: 10,
     }
 })
 

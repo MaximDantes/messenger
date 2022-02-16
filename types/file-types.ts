@@ -5,7 +5,6 @@ export const isFileTypeImage = (fileType: string | undefined | FileType) => {
 }
 
 export const isFileTypeOpenable = (fileType: string | undefined | FileType) => {
-    console.log(fileType)
     return fileType === 'pdf' || fileType === 'docx'
 }
 

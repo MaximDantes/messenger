@@ -1,6 +1,6 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {StyleSheet, TouchableOpacity, View} from 'react-native'
-import {screenStyles} from '../styles/common'
+import {headerStyles, screenStyles} from '../styles/common'
 import {useDispatch, useSelector} from 'react-redux'
 import {State} from '../store/store'
 import {selectChat} from '../selectors/chats-selectors'
@@ -8,41 +8,75 @@ import MessageForm from '../components/Messages/MessageForm'
 import {getChatMessages} from '../store/messages/messages-thunks'
 import MessagesContainer from '../components/Messages/MessagesContainer'
 import EntypoIcon from 'react-native-vector-icons/Entypo'
+import AntDesignIcon from 'react-native-vector-icons/AntDesign'
 import {useNavigation} from '@react-navigation/native'
 import {NavigationProps, ScreenProps} from '../types/screens'
+import {IMessage} from '../types/entities'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
     const chatId = props.route.params.id
 
-    const dispatch = useDispatch()
+    const chat = useSelector((state: State) => selectChat(state, chatId))
 
+    const dispatch = useDispatch()
     const navigation = useNavigation<NavigationProps>()
 
-    const chat = useSelector((state: State) => selectChat(state, chatId))
+    const [editedMessage, setEditedMessage] = useState<IMessage | null>(null)
+
+    const toggleChangeMode = (message?: IMessage, remove?: () => void) => {
+        if (message) {
+            setEditedMessage(message)
+        } else {
+            setEditedMessage(null)
+        }
+
+        if (remove) {
+            navigation.setOptions({
+                headerRight: () => (
+                    <TouchableOpacity
+                        onPress={remove}
+                    >
+                        <AntDesignIcon name={'delete'} color={'#0976FF'} size={22} style={headerStyles.icon}/>
+                    </TouchableOpacity>
+
+                )
+            })
+        } else {
+            navigation.setOptions({
+                title: chat?.title || 'Сообщения',
+
+                headerRight: () => <View style={headerStyles.iconsContainer}>
+                    <TouchableOpacity
+                        onPress={() => chat && navigation.navigate('Members',
+                            {members: chat.members, chatName: chat.title})}
+                    >
+                        <Ionicons name={'people-outline'} color={'#2196F3'} size={28} style={headerStyles.icon}/>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Attachments', {id: chatId})}
+                    >
+                        <EntypoIcon name={'attachment'} color={'#2196F3'} size={22} style={headerStyles.icon}/>
+                    </TouchableOpacity>
+                </View>
+            })
+        }
+    }
 
     useEffect(() => {
         dispatch(getChatMessages(chatId))
     }, [chatId])
 
     useEffect(() => {
-        navigation.setOptions({
-            title: chat?.title || 'Сообщения',
-
-            headerRight: () => (
-                <TouchableOpacity
-                    onPress={() => navigation.navigate('Attachments', {id: chatId})}
-                >
-                    <EntypoIcon name={'attachment'} color={'#2196F3'} size={22}/>
-                </TouchableOpacity>
-            )
-        })
+        toggleChangeMode()
     }, [chat])
 
     return <View style={screenStyles.container}>
         <View style={styles.container}>
-            {chat && <MessagesContainer chat={chat}/>}
+            {chat && <MessagesContainer chat={chat} toggleChangeMode={toggleChangeMode}/>}
 
-            <MessageForm chatId={chatId}/>
+            <MessageForm chatId={chatId} editedMessage={editedMessage} toggleEditMode={() => toggleChangeMode()}/>
         </View>
     </View>
 }
@@ -62,7 +96,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
 
-    headerIcon: {
+    icon: {
         height: 40,
         width: 40,
         borderRadius: 20,

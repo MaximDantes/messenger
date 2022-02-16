@@ -5,24 +5,24 @@ import {
     Image, NativeScrollEvent,
     NativeSyntheticEvent,
     ScrollView,
-    StyleSheet,
+    StyleSheet, Text,
     TouchableOpacity,
     View
 } from 'react-native'
 import {useDispatch, useSelector} from 'react-redux'
-import {selectFiles} from '../../selectors/files-selectors'
+import {selectFiles, selectFilesFetching} from '../../selectors/files-selectors'
 import {useNavigation} from '@react-navigation/native'
 import {getFiles} from '../../store/files/files-thunks'
 import File from './../common/File'
-import {StackNavigationProps} from '../../Main'
+import {NavigationProps, ScreenProps} from '../../types/screens'
+import {Preloader} from '../common/Preloader'
 
-const Attachments: React.FC = (props) => {
-    //@ts-ignore
+const Attachments: React.FC<ScreenProps<'ImagesAttachments'>> = (props) => {
     const type = props.route.params.type
-    //@ts-ignore
     const chatId = props.route.params.chatId
 
     const files = useSelector(selectFiles(type, chatId))
+    const isFetching = useSelector(selectFilesFetching)
 
     const dispatch = useDispatch()
 
@@ -30,7 +30,7 @@ const Attachments: React.FC = (props) => {
         dispatch(getFiles(chatId, type))
     }, [chatId])
 
-    const navigator = useNavigation<StackNavigationProps>()
+    const navigator = useNavigation<NavigationProps>()
     const showImages = (position: number) => {
         navigator.navigate('Images', {images: files.map(item => item.file), position})
     }
@@ -41,27 +41,30 @@ const Attachments: React.FC = (props) => {
         }
     }
 
-    return <ScrollView onScrollEndDrag={onBottomReached}>
-        <View style={styles.container}>
-            {type === 'IMG' ?
-                files.map((item, index) => (
-                    <TouchableOpacity
-                        key={item.id}
-                        style={styles.imageItem}
-                        onPress={() => showImages(index)}
-                    >
-                        <Image style={styles.image} source={{uri: item.file}}/>
-                    </TouchableOpacity>
-                ))
-                :
-                files.map(item => (
-                    <View key={item.id} style={styles.fileItem}>
-                        <File uri={item.file} name={item.fileName} key={item.id}/>
-                    </View>
-                ))}
-            <Button title={'more'} onPress={() => dispatch(getFiles(chatId, type))}/>
-        </View>
-    </ScrollView>
+    return isFetching
+        ?
+        <Preloader/>
+        :
+        <ScrollView onScrollEndDrag={onBottomReached}>
+            <View style={styles.container}>
+                {type === 'IMG' ?
+                    files.map((item, index) => (
+                        <TouchableOpacity
+                            key={item.id}
+                            style={styles.imageItem}
+                            onPress={() => showImages(index)}
+                        >
+                            <Image style={styles.image} source={{uri: item.file}}/>
+                        </TouchableOpacity>
+                    ))
+                    :
+                    files.map(item => (
+                        <View key={item.id} style={styles.fileItem}>
+                            <File uri={item.file} name={item.fileName} key={item.id}/>
+                        </View>
+                    ))}
+            </View>
+        </ScrollView>
 }
 
 export default Attachments

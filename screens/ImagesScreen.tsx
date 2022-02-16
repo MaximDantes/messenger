@@ -1,8 +1,11 @@
 import React, {useEffect} from 'react'
-import {Dimensions, Image, StyleSheet, View} from 'react-native'
+import {Dimensions, Image, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {RouteProp, useNavigation} from '@react-navigation/native'
 import Swiper from 'react-native-web-swiper'
 import {NavigationProps, ScreenProps} from '../types/screens'
+import {getFileName} from '../types/file-types'
+import {downloadFile} from '../utilits/download-file'
+import FeatherIcon from 'react-native-vector-icons/Feather'
 
 const ImagesScreen: React.FC<ScreenProps<'Images'>> = (props) => {
     const paramsImages = props.route.params.images
@@ -12,7 +15,13 @@ const ImagesScreen: React.FC<ScreenProps<'Images'>> = (props) => {
 
     const setTitle = (index: number) => {
         navigation.setOptions({
-            title: `${index}/${paramsImages.length}`
+            title: `${index}/${paramsImages.length}`,
+
+            headerRight: () => (
+                <TouchableOpacity onPress={() => downloadFile(paramsImages[position])}>
+                    <FeatherIcon name={'download'} color={'#2196F3'} size={22}/>
+                </TouchableOpacity>
+            )
         })
     }
 

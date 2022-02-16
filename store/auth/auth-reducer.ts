@@ -4,6 +4,7 @@ import messagesApi from '../../api/websocket-api'
 
 const initialState = {
     isAuth: false,
+    isError: false,
     token: '',
     isFetching: true,
 }
@@ -16,6 +17,12 @@ const authReducer = (state = initialState, action: Action): typeof initialState 
                 isAuth: action.payload
             }
 
+        case 'auth/LOGOUT_SUCCEED':
+            return {
+                ...state,
+                isAuth: false
+            }
+
         case 'auth/TOKEN_RECEIVED':
             messagesApi.token = action.payload
 
@@ -24,16 +31,16 @@ const authReducer = (state = initialState, action: Action): typeof initialState 
                 token: action.payload
             }
 
-        case 'auth/FETCHING_STARTED':
+        case 'auth/ERROR_STATE_CHANGED':
             return {
                 ...state,
-                isFetching: true
+                isError: action.payload
             }
 
-        case 'auth/FETCHING_FINISHED':
+        case 'auth/FETCHING_STATE_CHANGED':
             return {
                 ...state,
-                isFetching: false
+                isFetching: action.payload
             }
 
         default:

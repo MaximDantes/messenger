@@ -19,6 +19,14 @@ const authApi = {
             status: response.status
         }
     },
+
+    logout: async () => {
+        const response = await axiosInstance.post<ITokenResponse>('token/refresh/')
+
+        return {
+            status: response.status
+        }
+    }
 }
 
 export default authApi
