@@ -2,15 +2,18 @@ import {Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} 
 import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import * as DocumentPicker from 'expo-document-picker'
-import MessageFormFile from './MessageFormFile'
+import MessageFormAttachment from './MessageFormAttachment'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import {useNavigation} from '@react-navigation/native'
 import {isFileTypeImage} from '../../types/file-types'
-import {selectProfile} from '../../selectors/profile-selectors'
+import {selectProfile} from '../../store/profile/profile-selectors'
 import {sendMessage} from '../../store/messages/messages-thunks'
 import {NavigationProps} from '../../types/screens'
 import {IFile, IMessage} from '../../types/entities'
+import {selectSharedArticle} from '../../store/articles/articles-selectors'
+import ArticlePreview from '../Articles/ArticlePreview'
+import {removeArticleFromSharing} from '../../store/articles/articles-actions'
 
 type Props = {
     chatId: number
@@ -25,6 +28,7 @@ const MessageForm: React.FC<Props> = (props) => {
     const [message, setMessage] = useState('')
     const [files, setFiles] = useState<IFile[]>([])
 
+    const sharedArticles = useSelector(selectSharedArticle)
     const user = useSelector(selectProfile)
 
     useEffect(() => {
@@ -41,7 +45,8 @@ const MessageForm: React.FC<Props> = (props) => {
     const send = () => {
         if (!props.editedMessage) {
             if (user && (message.trim() || files.length > 0)) {
-                dispatch(sendMessage(message.trim(), props.chatId, user.id, files))
+                dispatch(sendMessage(message.trim(), props.chatId,
+                    user.id, files, sharedArticles.map(item => item.id)))
 
                 setMessage('')
                 setFiles([])
@@ -87,14 +92,14 @@ const MessageForm: React.FC<Props> = (props) => {
     const renderItems = () => {
         let imagesIndex = -1
 
-        return files.map((item, index) => {
+        return [...files.map((item, index) => {
                 if (isFileTypeImage(item.fileType)) {
                     imagesIndex++
                 }
 
                 const fileIndex = imagesIndex
 
-                return <MessageFormFile
+                return <MessageFormAttachment
                     key={(item.fileName || '') + index}
                     uri={item.file}
                     name={item.fileName || ''}
@@ -103,7 +108,14 @@ const MessageForm: React.FC<Props> = (props) => {
                     showFile={() => showFile(fileIndex)}
                 />
             }
-        )
+        ), ...sharedArticles.map(item => (
+            <MessageFormAttachment
+                key={item.id}
+                articlePreview={item}
+                type={'article'}
+                removeFile={() => dispatch(removeArticleFromSharing(item.id))}
+            />
+        ))]
     }
 
     return <View style={styles.container}>
@@ -113,6 +125,12 @@ const MessageForm: React.FC<Props> = (props) => {
                 <MaterialIcon name={'close'} color={'#666666'} size={22}/>
             </TouchableOpacity>
         </View>}
+
+        {sharedArticles.map((item, index) => (
+            <TouchableOpacity key={item.id + index}>
+                <ArticlePreview articlePreview={item}/>
+            </TouchableOpacity>
+        ))}
 
         <ScrollView horizontal={true}>
             {renderItems()}

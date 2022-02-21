@@ -20,8 +20,7 @@ const profileReducer = (state = initialState, action: Action): typeof initialSta
                 ...state,
                 profile: state.profile ? {
                     ...state.profile,
-                    firstName: action.payload.firstName,
-                    lastName: action.payload.lastName,
+                    ...action.payload
                 } : null
             }
 

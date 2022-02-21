@@ -19,10 +19,6 @@ const MessageFiles: React.FC<Props> = (props) => {
         navigator.navigate('Images', {position, images: images.map(item => item.file)})
     }
 
-    const showFile = (file: IFile) => {
-        navigator.navigate('Documents', {uri: file.file, name: file.fileName})
-    }
-
     const renderItems = () => {
         let imagesIndex = -1
 
@@ -37,8 +33,8 @@ const MessageFiles: React.FC<Props> = (props) => {
                 key={item.id || item.file + index}
                 file={item}
                 variant={index > 1 ? 'small' : 'large'}
+                isSingle={props.files.length === 1}
                 showImages={() => showImages(fileIndex)}
-                showFile={() => showFile(item)}
             />
         })
     }
@@ -54,6 +50,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         flexWrap: 'wrap',
         flexShrink: 1,
+        borderRadius: 5,
+        overflow: 'hidden',
     },
 })
 

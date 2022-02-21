@@ -4,18 +4,28 @@ import React, {useEffect} from 'react'
 import {NavigationProps, ScreenProps} from '../types/screens'
 import Member from '../components/Members/Member'
 import {useNavigation} from '@react-navigation/native'
+import {useDispatch, useSelector} from 'react-redux'
+import {getChatMembers} from '../store/chats/chats-thunks'
+import {selectChatMembers} from '../store/chats/chats-selectors'
 
 const MembersScreen: React.FC<ScreenProps<'Members'>> = (props) => {
-    const members = props.route.params.members
+    const chatId = props.route.params.chatId
     const chatName = props.route.params.chatName
 
     const navigation = useNavigation<NavigationProps>()
+    const dispatch = useDispatch()
+
+    const members = useSelector(selectChatMembers(chatId))
 
     useEffect(() => {
+        if (members.length === 0) {
+            dispatch(getChatMembers(chatId))
+        }
+
         navigation.setOptions({
             title: chatName
         })
-    }, [members])
+    }, [chatId])
 
     return <View style={[screenStyles.container, styles.container]}>
         <ScrollView>

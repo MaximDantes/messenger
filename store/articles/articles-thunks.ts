@@ -1,13 +1,30 @@
 import {Thunk} from './articles-reducer'
-import {articlesReceived} from './articles-actions'
+import {articleReceived, articlesPreviewsReceived} from './articles-actions'
 import articlesApi from '../../api/articles-api'
+import {statusCodes} from '../../types/status-codes'
+import store from '../store'
 
-export const getArticles = (specialityId: number, courseId: number, teacherId?: number): Thunk => async (dispatch) => {
+export const getArticlesPreviews = (specialityId: number, year: number, subjectId: number, teacher?: string): Thunk =>
+    async (dispatch) => {
     try {
-        const response = await articlesApi.get(specialityId, courseId, teacherId)
+        const response = await articlesApi.getPreviews(specialityId, year, subjectId, teacher)
 
-        dispatch(articlesReceived(response))
+        if (response.status === statusCodes.success) {
+            dispatch(articlesPreviewsReceived(response.data))
+        }
     } catch (e) {
-        console.error('get articles', e)
+        console.error('get articles previews', e)
+    }
+}
+
+export const getArticle = (articleId: number): Thunk => async (dispatch) => {
+    try {
+        const response = await articlesApi.get(articleId)
+
+        if (response.status === statusCodes.success) {
+            dispatch(articleReceived(response.data))
+        }
+    } catch (e) {
+        console.error('get article', e)
     }
 }

@@ -1,7 +1,8 @@
 import {Cursors, Thunk} from './chats-reducer'
 import {chatsApi} from '../../api/chats-api'
-import {chatsReceived, cursorChanged, lastMessageChanged} from './chats-actions'
+import {chatMembersReceived, chatsReceived, cursorChanged, lastMessageChanged} from './chats-actions'
 import {IMessage} from '../../types/entities'
+import {statusCodes} from '../../types/status-codes'
 
 export const getChats = (userId: number): Thunk => async (dispatch) => {
     try {
@@ -10,6 +11,18 @@ export const getChats = (userId: number): Thunk => async (dispatch) => {
         dispatch(chatsReceived(response))
     } catch (e) {
         console.error('get chats', e)
+    }
+}
+
+export const getChatMembers = (chatId: number): Thunk => async (dispatch) => {
+    try {
+        const response = await chatsApi.getMembers(chatId)
+
+        if (response.status === statusCodes.success) {
+            dispatch(chatMembersReceived(chatId, response.data))
+        }
+    } catch (e) {
+        console.error('get chat members', e)
     }
 }
 

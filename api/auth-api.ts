@@ -8,7 +8,7 @@ const authApi = {
             email, password
         })
 
-        return response.data
+        return response
     },
 
     refreshToken: async () => {

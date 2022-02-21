@@ -1,13 +1,13 @@
-import {IProfile} from '../../types/entities'
+import {IProfile, IProfileInfo} from '../../types/entities'
 
 export const profileReceived = (profile: IProfile | null) => ({
     type: 'profile/PROFILE_RECEIVED',
     payload: profile
 } as const)
 
-export const profileEdited = (firstName: string, lastName: string) => ({
+export const profileEdited = (profileInfo: IProfileInfo) => ({
     type: 'profile/PROFILE_EDITED',
-    payload: {firstName, lastName}
+    payload: profileInfo
 } as const)
 
 export const avatarEdited = (avatar: string) => ({

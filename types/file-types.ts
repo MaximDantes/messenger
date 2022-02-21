@@ -1,4 +1,4 @@
-export type FileType = 'unknown' | 'IMG' | 'image/jpeg'| 'image/png' | 'pdf' | 'docx' | string
+export type FileType = 'unknown' | 'IMG' | 'image/jpeg'| 'image/png' | 'pdf' | 'docx' | 'article' | string
 
 export const isFileTypeImage = (fileType: string | undefined | FileType) => {
     return fileType === 'image/png' || fileType === 'image/jpeg' || fileType === 'IMG'

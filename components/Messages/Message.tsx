@@ -1,8 +1,6 @@
-import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, Vibration, View} from 'react-native'
+import {StyleSheet, Text, TouchableOpacity, Vibration, View} from 'react-native'
 import React from 'react'
-import {IFile, IMessage} from '../../types/entities'
-import {NativeStackNavigatorProps} from 'react-native-screens/lib/typescript/native-stack/types'
-import {NativeStackNavigationProp} from '@react-navigation/native-stack'
+import {IFile} from '../../types/entities'
 import MessageFiles from './MessageFiles'
 import {MessagePreloader} from '../common/Preloader'
 import {getPrintTimeFormat} from '../../utilits/format-date'
@@ -24,21 +22,27 @@ const Message: React.FC<Props> = (props) => {
         }
     }
 
+    const messageStyles = props.sentByCurrentUser ?
+        [styles.message, styles.currentUserMessage, !props.text && styles.onlyFilesMessage]
+        : [styles.message, !props.text && styles.onlyFilesMessage]
+    const dateContainerStyles =  !props.text ? [styles.dateContainer, styles.onlyFilesDateContainer] : styles.dateContainer
+    const dateTextStyles =  !props.text ? [styles.dateText, styles.onlyFilesDateText] : styles.dateText
+
     return <View
         style={props.sentByCurrentUser ? [styles.container, styles.currentUserMessageContainer] : styles.container}
     >
         {(props.inSending && props.sentByCurrentUser) && <View style={styles.preloader}><MessagePreloader/></View>}
 
         <TouchableOpacity
-            style={props.sentByCurrentUser ? [styles.message, styles.currentUserMessage] : styles.message}
+            style={messageStyles}
             onLongPress={change}
         >
             {!!props.text && <Text>{props.text}</Text>}
 
             <MessageFiles files={props.files}/>
 
-            <View style={styles.date}>
-                <Text>{getPrintTimeFormat(props.time)}</Text>
+            <View style={dateContainerStyles}>
+                <Text style={dateTextStyles}>{getPrintTimeFormat(props.time)}</Text>
             </View>
         </TouchableOpacity>
     </View>
@@ -58,10 +62,22 @@ const styles = StyleSheet.create({
 
     message: {
         maxWidth: '90%',
-        borderRadius: 5,
+        minWidth: 50,
+        borderRadius: 8,
         padding: 5,
         backgroundColor: '#dedede',
         alignSelf: 'flex-start',
+    },
+
+    onlyFilesMessage: {
+        padding: 0,
+    },
+
+    onlyFilesDateContainer: {
+        position: 'absolute',
+        right: 0,
+        bottom: 0,
+        padding: 3,
     },
 
     currentUserMessage: {
@@ -69,10 +85,21 @@ const styles = StyleSheet.create({
         alignSelf: 'flex-end',
     },
 
-    date: {
+    dateContainer: {
         flexBasis: 1,
         flexDirection: 'row',
         justifyContent: 'flex-end',
+    },
+
+    dateText: {
+        fontSize: 12,
+    },
+
+    onlyFilesDateText: {
+        backgroundColor: '#00000066',
+        borderRadius: 5,
+        padding: 3,
+        color: '#fff',
     },
 
     preloader: {

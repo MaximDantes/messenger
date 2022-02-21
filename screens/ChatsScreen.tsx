@@ -2,17 +2,18 @@ import React, {useEffect} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import {StyleSheet, View} from 'react-native'
 import {screenStyles} from '../styles/common'
-import {selectChats} from '../selectors/chats-selectors'
+import {selectChats} from '../store/chats/chats-selectors'
 import {getChats} from '../store/chats/chats-thunks'
 import Chat from '../components/Chats/Chat'
-import {selectProfile} from '../selectors/profile-selectors'
+import {selectProfile} from '../store/profile/profile-selectors'
 import {NavigationProps, ScreenProps} from '../types/screens'
 import {useNavigation} from '@react-navigation/native'
 
-const ChatsScreen: React.FC<ScreenProps<'Chats'>> = (props) => {
+const ChatsScreen: React.FC<ScreenProps<'Chats'>> = () => {
     const dispatch = useDispatch()
     const navigation = useNavigation<NavigationProps>()
 
+    const chats = useSelector(selectChats)
     const profile = useSelector(selectProfile)
 
     const onPress = (id: number) => {
@@ -20,13 +21,8 @@ const ChatsScreen: React.FC<ScreenProps<'Chats'>> = (props) => {
     }
 
     useEffect(() => {
-        if (profile) {
-            dispatch(getChats(profile.id))
-        }
+        profile && dispatch(getChats(profile.id))
     }, [profile])
-
-
-    const chats = useSelector(selectChats)
 
     return <View style={[screenStyles.container, styles.container]}>
         {chats.map(item => (

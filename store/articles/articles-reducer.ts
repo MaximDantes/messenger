@@ -1,18 +1,37 @@
 import {ActionTemplate, ThunkTemplate} from '../../types/redux'
 import * as actions from './articles-actions'
-import {IArticle, ISpeciality} from '../../types/entities'
-import excludeSameId from '../../utilits/exclude-same-id'
+import {IArticle, IArticlePreview} from '../../types/entities'
 
 const initialState = {
-    articles: [] as IArticle[]
+    articlesPreviews: [] as IArticlePreview[],
+    articles: [] as IArticle[],
+    sharedArticles: [] as IArticlePreview[],
 }
 
 const articlesReducer = (state = initialState, action: Action): typeof initialState => {
     switch (action.type) {
-        case 'articles/ARTICLES_RECEIVED':
+        case 'articles/ARTICLES_PREVIEWS_RECEIVED':
             return {
                 ...state,
-                articles: excludeSameId([...state.articles, ...action.payload])
+                articlesPreviews: action.payload
+            }
+
+        case 'articles/ARTICLE_RECEIVED':
+            return {
+                ...state,
+                articles: [...state.articles, action.payload]
+            }
+
+        case 'articles/SHARED_ARTICLE_CHANGED':
+            return {
+                ...state,
+                sharedArticles: [...state.sharedArticles, action.payload]
+            }
+
+        case 'articles/ARTICLE_REMOVED_FROM_SHARING':
+            return {
+                ...state,
+                sharedArticles: state.sharedArticles.filter(item => item.id !== action.payload)
             }
 
         default:

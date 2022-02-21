@@ -1,4 +1,4 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native'
 import React, {useEffect} from 'react'
 import WebView from 'react-native-webview'
 import {getFileName, getFileType} from '../types/file-types'
@@ -36,17 +36,25 @@ const DocumentsScreen: React.FC<ScreenProps<'Documents'>> = (props) => {
     }
 
     return <View style={styles.container}>
+        {Platform.OS === 'web'
+            ?
+            <iframe src={source} style={styles.iframe}/>
+            :
         <WebView
             source={{uri: source}}
             startInLoadingState={true}
             style={styles.container}
-        />
+        />}
     </View>
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+
+    iframe: {
+        height: '100%'
     },
 })
 

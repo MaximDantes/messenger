@@ -2,8 +2,9 @@ import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from '
 import React from 'react'
 import {IChat} from '../../types/entities'
 import {useSelector} from 'react-redux'
-import {selectProfile} from '../../selectors/profile-selectors'
+import {selectProfile} from '../../store/profile/profile-selectors'
 import {getPrintTimeFormat} from '../../utilits/format-date'
+import Card from '../common/Card'
 
 type Props = {
     chat: IChat
@@ -27,11 +28,11 @@ const Chat: React.FC<Props> = (props) => {
         }
     }
 
-    return <TouchableOpacity
+    return <Card
         onPress={() => props.onPress(props.chat.id)}
         style={styles.container}
     >
-        {props.chat.cover && <ImageBackground source={{uri: props.chat.cover}} style={styles.image}/>}
+        {props.chat.cover && <Image source={{uri: props.chat.cover}} style={styles.image}/>}
 
         <View style={styles.textContainer}>
             <Text style={styles.text}>{props.chat.title}</Text>
@@ -45,23 +46,22 @@ const Chat: React.FC<Props> = (props) => {
                 </View>
 
                 {!!props.chat.lastMessage?.date &&
-                    <Text style={styles.text}>{getPrintTimeFormat(props.chat.lastMessage.date)}</Text>}
+                    <Text style={[styles.text, styles.date]}>
+                        {getPrintTimeFormat(props.chat.lastMessage.date)}
+                    </Text>}
             </View>
         </View>
-    </TouchableOpacity>
+    </Card>
 }
 
 const styles = StyleSheet.create({
     container: {
-        width: '100%',
         flexDirection: 'row',
         marginVertical: 3,
-        padding: 7,
-        borderRadius: 5,
-        backgroundColor: '#E0EFFF',
     },
 
     textContainer: {
+        flex: 1,
         paddingHorizontal: 5,
     },
 
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     lastMessageDateContainer: {
         flex: 1,
         flexDirection: 'row',
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'space-between',
     },
 
@@ -85,6 +85,10 @@ const styles = StyleSheet.create({
         color: '#000',
     },
 
+    date: {
+        fontSize: 12,
+    },
+
     files: {
         color: '#00f',
     },
@@ -92,6 +96,7 @@ const styles = StyleSheet.create({
     image: {
         width: 50,
         height: 50,
+        borderRadius: 3,
     },
 
     avatar: {

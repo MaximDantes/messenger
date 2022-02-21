@@ -1,15 +1,10 @@
 import authApi from '../../api/auth-api'
-import {
-    authorized,
-    errorStateChanged,
-    fetchingStateChanged,
-    logoutSucceed,
-    tokenReceived
-} from './auth-actions'
+import {authorized, errorStateChanged, fetchingStateChanged, logoutSucceed, tokenReceived} from './auth-actions'
 import {Thunk} from './auth-reducer'
 import {getProfile} from '../profile/profile-thunks'
 import {statusCodes} from '../../types/status-codes'
 import {startMessagesListening} from '../messages/messages-thunks'
+import handleTokenExpired from '../handle-token-expired'
 
 export const auth = (email: string, password: string): Thunk => async (dispatch) => {
     try {
@@ -19,12 +14,15 @@ export const auth = (email: string, password: string): Thunk => async (dispatch)
 
         dispatch(getProfile())
 
-        dispatch(tokenReceived(response.access))
+        dispatch(tokenReceived(response.data.access))
 
         dispatch(startMessagesListening())
 
         dispatch(errorStateChanged(false))
+
     } catch (e) {
+        // await handleTokenExpired(e, () => dispatch(auth(email, password)))
+
         console.error('auth', e)
         dispatch(errorStateChanged(true))
     }
@@ -46,13 +44,15 @@ export const logout = (): Thunk => async (dispatch) => {
     }
 }
 
-export const refreshToken = (): Thunk => async (dispatch) => {
+export const refreshToken = (rejectedThunk?: Function): Thunk => async (dispatch) => {
     try {
+        console.log(rejectedThunk)
         dispatch(fetchingStateChanged(true))
 
         const response = await authApi.refreshToken()
 
         if (response.status === statusCodes.success) {
+            rejectedThunk && dispatch(rejectedThunk())
             dispatch(authorized(true))
             dispatch(tokenReceived(response.data.access))
         }

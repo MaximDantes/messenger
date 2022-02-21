@@ -1,4 +1,4 @@
 export enum statusCodes {
     success = 200,
-    unauthorized = 403,
+    unauthorized = 401,
 }

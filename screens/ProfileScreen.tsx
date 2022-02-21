@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
-import {Alert, Button, Platform, ScrollView, StyleSheet, TouchableOpacity, useColorScheme, View} from 'react-native'
+import {Alert, Button, Platform, ScrollView, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {useDispatch, useSelector} from 'react-redux'
-import {selectProfile, selectProfileFetching} from '../selectors/profile-selectors'
+import {selectProfile, selectProfileFetching} from '../store/profile/profile-selectors'
 import Avatar from '../components/Profile/Avatar'
 import {DocumentResult} from 'expo-document-picker'
 import {editProfile, setAvatar} from '../store/profile/profile-thunks'
@@ -54,26 +54,12 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
 
     const [editMode, setEditMode] = useState(false)
     const [file, setFile] = useState<DocumentResult | null>(null)
-    const [firstName, setFirstName] = useState('')
-    const [lastName, setLastName] = useState('')
 
-    useEffect(() => {
-        if (!editMode) {
-            setFirstName(profile?.firstName || '')
-            setLastName(profile?.lastName || '')
-        }
-    }, [editMode, profile])
 
-    const save = async () => {
+    const saveAvatar = async () => {
         if (file && file.type === 'success') {
             dispatch(setAvatar(file))
-
             setFile(null)
-            setEditMode(false)
-        }
-
-        if (firstName && lastName && (firstName !== profile?.firstName || lastName !== profile.lastName)) {
-            dispatch(editProfile(firstName, lastName))
             setEditMode(false)
         }
     }
@@ -87,21 +73,14 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
                 <Avatar editMode={editMode} source={profile?.avatar} file={file} setFile={setFile}/>
 
                 <ProfileForm
-                    firstName={firstName}
-                    lastName={lastName}
+                    firstName={profile?.firstName || ''}
+                    lastName={profile?.lastName || ''}
+                    phoneNumber={profile?.phoneNumber || ''}
+                    phonePublicity={profile?.phonePublicity || true}
                     editMode={editMode}
-                    setFirstName={setFirstName}
-                    setLastName={setLastName}
+                    disableEditMode={() => setEditMode(false)}
+                    saveAvatar={saveAvatar}
                 />
-            </View>
-
-            <View style={styles.buttonsContainer}>
-                {editMode &&
-                    <>
-                        <Button title={'Сохранить'} onPress={save}/>
-                        <Button title={'Отмена'} onPress={() => setEditMode(false)}/>
-                    </>
-                }
             </View>
         </ScrollView>
 }
@@ -109,12 +88,6 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-    },
-
-    buttonsContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginVertical: 5
     },
 })
 

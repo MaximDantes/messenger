@@ -15,6 +15,21 @@ const chatsReducer = (state = initialState, action: Action): typeof initialState
                 chats: action.payload
             }
 
+        case 'chats/CHAT_MEMBERS_RECEIVED':
+            const chat = state.chats.find(item => item.id === action.payload.chatId)
+
+            if (chat) {
+                return {
+                    ...state,
+                    chats: [
+                        ...state.chats.filter(item => item.id !== action.payload.chatId),
+                        {...chat, members: action.payload.members}
+                    ]
+                }
+            }
+
+            return state
+
         case 'chats/CURSORS_CHANGED': {
             const chat = state.chats.find(item => item.id === action.payload.chatId)
 

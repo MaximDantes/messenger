@@ -1,7 +1,6 @@
 import {
-    Alert,
     Button,
-    Image, KeyboardAvoidingView,
+    Image,
     NativeScrollEvent,
     NativeSyntheticEvent,
     Platform,
@@ -15,12 +14,12 @@ import React, {useEffect, useRef} from 'react'
 import {getChatMessages, removeMessage} from '../../store/messages/messages-thunks'
 import {useDispatch, useSelector} from 'react-redux'
 import {State} from '../../store/store'
-import {selectChatMessages, selectMessagesFetching} from '../../selectors/messages-selectors'
-import {selectProfile} from '../../selectors/profile-selectors'
+import {selectChatMessages, selectMessagesFetching} from '../../store/messages/messages-selectors'
+import {selectProfile} from '../../store/profile/profile-selectors'
 import {IChat, IMessage} from '../../types/entities'
 import {getMonthName, isToday, isYesterday} from '../../utilits/format-date'
-import message from './Message'
-import {Preloader} from '../common/Preloader'
+import {MessagePreloader, Preloader} from '../common/Preloader'
+import {selectIsMessagesLeft} from '../../store/chats/chats-selectors'
 
 type Props = {
     chat: IChat
@@ -30,13 +29,21 @@ type Props = {
 const MessagesContainer: React.FC<Props> = (props) => {
     const dispatch = useDispatch()
 
-    const messages = useSelector((state: State) => selectChatMessages(state, props.chat.id))
+    const messages = useSelector(selectChatMessages(props.chat.id))
     const profile = useSelector(selectProfile)
     const isReceivingMessages = useSelector(selectMessagesFetching)
+    const isMessagesLeft = useSelector(selectIsMessagesLeft(props.chat.id))
 
     useEffect(() => {
-        scrollView.current?.scrollToEnd()
+        scrollView.current?.scrollToEnd({animated: false})
     }, [messages[messages.length - 1]])
+
+    useEffect(() => {
+        //TODO set final messages count
+        if (messages.length < 15) {
+            dispatch(getChatMessages(props.chat.id))
+        }
+    }, [props.chat.id])
 
     const scrollView = useRef<ScrollView>(null)
 
@@ -48,14 +55,14 @@ const MessagesContainer: React.FC<Props> = (props) => {
 
     const onContentSizeChange = (width: number, height: number) => {
         if (height - scrollContentSize.current > 100 || scrollContentSize.current - height > 100) {
-            //scrollView.current?.scrollTo({y: height - scrollContentSize.current, animated: false})
+            scrollView.current?.scrollTo({y: height - scrollContentSize.current, animated: false})
         }
         scrollContentSize.current = height
     }
 
 
     const loadPreviousMessages = () => {
-        if (!isReceivingMessages) {
+        if (!isReceivingMessages && isMessagesLeft) {
             dispatch(getChatMessages(props.chat.id))
         }
     }
@@ -90,9 +97,7 @@ const MessagesContainer: React.FC<Props> = (props) => {
             onContentSizeChange={onContentSizeChange}
             onLayout={() => scrollView.current?.scrollToEnd({animated: false})}
         >
-            {Platform.OS === 'web' && <Button title={'more'} onPress={loadPreviousMessages}/>}
-
-            {isReceivingMessages && <Text>Загрузка сообщений</Text>}
+            {isReceivingMessages && <View style={styles.preloaderContainer}><MessagePreloader/></View>}
 
             {messages.map((item, index, array) => (
                 <View key={item.id}>
@@ -153,7 +158,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 7,
         paddingVertical: 3,
         color: '#ffffff'
-    }
+    },
+
+    preloaderContainer: {
+        paddingVertical: 3,
+    },
 })
 
 export default MessagesContainer

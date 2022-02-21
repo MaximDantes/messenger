@@ -9,7 +9,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import EntypoIcon from 'react-native-vector-icons/Entypo'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import AuthScreen from './screens/AuthScreen'
-import {selectAuthFetching, selectIsAuth} from './selectors/auth-selectors'
+import {selectAuthFetching, selectIsAuth} from './store/auth/auth-selectors'
 import ChatsScreen from './screens/ChatsScreen'
 import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import MessagesScreen from './screens/MessagesScreen'
@@ -19,9 +19,11 @@ import ImagesScreen from './screens/ImagesScreen'
 import AttachmentsScreen from './screens/AttachmentsScreen'
 import ArticleScreen from './screens/ArticleScreen'
 import {StackNavigatorParamList, TabNavigatorParamList} from './types/screens'
-import LibrarySpecialityScreen from './screens/LibrarySpecialityScreen'
+import LibraryYearsScreen from './screens/LibraryYearsScreen'
 import MembersScreen from './screens/MembersScreen'
 import ChangePasswordScreen from './screens/ChangePasswordScreen'
+import LibrarySubjectsScreen from './screens/LibrarySubjectsScreen'
+import LibraryArticlesScreen from './screens/LibraryArticlesScreen'
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>()
 const Stack = createNativeStackNavigator<StackNavigatorParamList>()
@@ -29,6 +31,9 @@ const Stack = createNativeStackNavigator<StackNavigatorParamList>()
 const MainNavigation: React.FC = () => {
     return <Tab.Navigator
         screenOptions={({route}) => ({
+            //TODO remove animation
+            tabBarHideOnKeyboard: true,
+
             tabBarIcon: ({focused, color, size}) => {
                 switch (route.name) {
                     case 'Profile':
@@ -43,21 +48,9 @@ const MainNavigation: React.FC = () => {
             },
         })}
     >
-        <Tab.Screen
-            name={'Profile'}
-            component={ProfileScreen}
-            options={{title: 'Профиль'}}
-        />
-        <Tab.Screen
-            name={'Chats'}
-            component={ChatsScreen}
-            options={{title: 'Диалоги'}}
-        />
-        <Tab.Screen
-            name={'Library'}
-            component={LibraryScreen}
-            options={{title: 'Библиотека'}}
-        />
+        <Tab.Screen name={'Profile'} component={ProfileScreen} options={{title: 'Профиль'}}/>
+        <Tab.Screen name={'Chats'} component={ChatsScreen} options={{title: 'Диалоги'}}/>
+        <Tab.Screen name={'Library'} component={LibraryScreen} options={{headerShown: false, title: 'Вики'}}/>
     </Tab.Navigator>
 }
 
@@ -89,48 +82,18 @@ const Main: React.FC = () => {
             >
                 {isAuth ?
                     <>
-                        <Stack.Screen
-                            name={'Main'}
-                            component={MainNavigation}
-                            options={{headerShown: false}}
-
-                        />
-                        <Stack.Screen
-                            name={'Messages'}
-                            component={MessagesScreen}
-                        />
-                        <Stack.Screen
-                            name={'Documents'}
-                            component={DocumentsScreen}
-                        />
-                        <Stack.Screen
-                            name={'Images'}
-                            component={ImagesScreen}
-                        />
-                        <Stack.Screen
-                            name={'Attachments'}
-                            component={AttachmentsScreen}
-                            options={{title: 'Вложения'}}
-                        />
-                        <Stack.Screen
-                            name={'Article'}
-                            component={ArticleScreen}
-                        />
-                        <Stack.Screen
-                            name={'LibrarySpeciality'}
-                            component={LibrarySpecialityScreen}
-                        />
-                        <Stack.Screen
-                            name={'Members'}
-                            component={MembersScreen}
-                        />
-                        <Stack.Screen
-                            options={{
-                                title: 'Изменение пароля'
-                            }}
-                            name={'ChangePassword'}
-                            component={ChangePasswordScreen}
-                        />
+                        <Stack.Screen name={'Main'} component={MainNavigation} options={{headerShown: false}}/>
+                        <Stack.Screen name={'Messages'} component={MessagesScreen}/>
+                        <Stack.Screen name={'Documents'} component={DocumentsScreen}/>
+                        <Stack.Screen name={'Images'} component={ImagesScreen}/>
+                        <Stack.Screen name={'Attachments'} component={AttachmentsScreen} options={{title: 'Вложения'}}/>
+                        <Stack.Screen name={'Article'} component={ArticleScreen}/>
+                        {/*<Stack.Screen name={'LibraryYears'} component={LibraryYearsScreen}/>*/}
+                        {/*<Stack.Screen name={'LibrarySubjects'} component={LibrarySubjectsScreen}/>*/}
+                        {/*<Stack.Screen name={'LibraryArticles'} component={LibraryArticlesScreen}/>*/}
+                        <Stack.Screen name={'Members'} component={MembersScreen}/>
+                        <Stack.Screen options={{title: 'Изменение пароля'}} name={'ChangePassword'}
+                                      component={ChangePasswordScreen}/>
                     </>
 
                     :

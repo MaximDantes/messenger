@@ -1,4 +1,4 @@
-import {IChat} from '../types/entities'
+import {IChat, IUser} from '../types/entities'
 import axiosInstance from './api'
 import {formatDate} from '../utilits/format-date'
 import {snakeToCamel} from '../utilits/case-convert'
@@ -16,32 +16,16 @@ export const chatsApi = {
             nextImagesCursor: '',
             previousImagesCursor: '',
             clientSideId: -1,
-            members: [
-                {
-                    id: 1,
-                    email: 'mfetisov2002@gmail.com',
-                    phone: '+375294539810',
-                    firstName: 'Сципион',
-                    lastName: 'Африканский',
-                    avatar: 'https://ggaekappbucket.s3.amazonaws.com/media/mfetisov2002%40gmail.com/hE2kUb1aNfY1.jpg',
-                },
-                {
-                    id: 2,
-                    email: 'po14342@gmail.com',
-                    phone: '+375294539810',
-                    firstName: 'Лоуренс',
-                    lastName: 'Аравийский',
-                    avatar: 'https://ggaekappbucket.s3.amazonaws.com/media/mfetisov2002%40gmail.com/hE2kUb1aNfY1.jpg',
-                },
-                {
-                    id: 3,
-                    email: 'ggaek@ggaek.by',
-                    phone: '+375294539810',
-                    firstName: 'Михаил',
-                    lastName: 'Милорадович',
-                    avatar: 'https://ggaekappbucket.s3.amazonaws.com/media/mfetisov2002%40gmail.com/hE2kUb1aNfY1.jpg',
-                },
-            ]
+            members: [],
         })))
+    },
+
+    getMembers: async (chatId: number) => {
+        const response = await axiosInstance.get(`chat/${chatId}/users`)
+
+        return {
+            data: snakeToCamel<IUser[]>(response.data),
+            status: response.status
+        }
     },
 }

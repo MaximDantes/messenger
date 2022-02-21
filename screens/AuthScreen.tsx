@@ -4,7 +4,7 @@ import {screenStyles} from '../styles/common'
 import {useDispatch, useSelector} from 'react-redux'
 import {auth} from '../store/auth/auth-thunks'
 import {ScreenProps} from '../types/screens'
-import {selectIsAuthError} from '../selectors/auth-selectors'
+import {selectIsAuthError} from '../store/auth/auth-selectors'
 import PasswordStrengthValidator from '../components/Auth/PasswordStrengthValidator'
 import PasswordInput from '../components/common/PasswordInput'
 

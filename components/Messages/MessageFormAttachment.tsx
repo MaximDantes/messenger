@@ -4,21 +4,25 @@ import {FileType, isFileTypeImage} from '../../types/file-types'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import File from '../common/File'
+import ArticlePreview from '../Articles/ArticlePreview'
+import {IArticlePreview} from '../../types/entities'
 
 type Props = {
-    uri: string
-    name: string
+    uri?: string
+    name?: string
+    articlePreview?: IArticlePreview
     type: FileType
     removeFile(): void
-    showFile(): void
+    showFile?(): void
 }
 
-const MessageFormFile: React.FC<Props> = (props) => {
+const MessageFormAttachment: React.FC<Props> = (props) => {
     const isImage = isFileTypeImage(props.type)
+    const isArticle = props.type === 'article'
 
     const showFile = () => {
         if (isImage) {
-            props.showFile()
+            props.showFile?.()
         }
     }
 
@@ -26,25 +30,29 @@ const MessageFormFile: React.FC<Props> = (props) => {
     const [shakeAnimation, setShakeAnimation] = useState(new Animated.Value(0))
     const startShake = () => {
         Animated.sequence([
-            Animated.timing(shakeAnimation, { toValue: 3, duration: 100, useNativeDriver: true }),
-            Animated.timing(shakeAnimation, { toValue: -3, duration: 100, useNativeDriver: true }),
-            Animated.timing(shakeAnimation, { toValue: 3, duration: 100, useNativeDriver: true }),
-            Animated.timing(shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
-        ]).start();
+            Animated.timing(shakeAnimation, {toValue: 3, duration: 100, useNativeDriver: true}),
+            Animated.timing(shakeAnimation, {toValue: -3, duration: 100, useNativeDriver: true}),
+            Animated.timing(shakeAnimation, {toValue: 3, duration: 100, useNativeDriver: true}),
+            Animated.timing(shakeAnimation, {toValue: 0, duration: 100, useNativeDriver: true})
+        ]).start()
     }
 
     useEffect(() => {
         startShake()
     }, [])
 
-    return <Animated.View style={[styles.container, { transform: [{translateX: shakeAnimation}] }]} >
+    return <Animated.View style={[styles.container, {transform: [{translateX: shakeAnimation}]}]}>
         {isImage
             ?
             <TouchableOpacity style={styles.imageContainer} onPress={showFile}>
                 <ImageBackground style={styles.image} source={{uri: props.uri}}/>
             </TouchableOpacity>
             :
-            <File uri={props.uri} name={props.name} showingDisabled={true}/>
+            (!isArticle && props.uri && props.name)
+                ?
+                <File uri={props.uri} name={props.name} showingDisabled={true}/>
+                :
+                !!props.articlePreview && <ArticlePreview articlePreview={props.articlePreview}/>
         }
         <TouchableOpacity
             style={isImage ? [styles.filledContainer, styles.buttonContainer] : styles.buttonContainer}
@@ -92,4 +100,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default MessageFormFile
+export default MessageFormAttachment

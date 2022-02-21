@@ -2,8 +2,7 @@ import React, {useEffect, useState} from 'react'
 import {StyleSheet, TouchableOpacity, View} from 'react-native'
 import {headerStyles, screenStyles} from '../styles/common'
 import {useDispatch, useSelector} from 'react-redux'
-import {State} from '../store/store'
-import {selectChat} from '../selectors/chats-selectors'
+import {selectChat} from '../store/chats/chats-selectors'
 import MessageForm from '../components/Messages/MessageForm'
 import {getChatMessages} from '../store/messages/messages-thunks'
 import MessagesContainer from '../components/Messages/MessagesContainer'
@@ -17,10 +16,10 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
     const chatId = props.route.params.id
 
-    const chat = useSelector((state: State) => selectChat(state, chatId))
-
     const dispatch = useDispatch()
     const navigation = useNavigation<NavigationProps>()
+
+    const chat = useSelector(selectChat(chatId))
 
     const [editedMessage, setEditedMessage] = useState<IMessage | null>(null)
 
@@ -48,8 +47,7 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
 
                 headerRight: () => <View style={headerStyles.iconsContainer}>
                     <TouchableOpacity
-                        onPress={() => chat && navigation.navigate('Members',
-                            {members: chat.members, chatName: chat.title})}
+                        onPress={() => chat && navigation.navigate('Members', {chatId: chat.id, chatName: chat.title})}
                     >
                         <Ionicons name={'people-outline'} color={'#2196F3'} size={28} style={headerStyles.icon}/>
                     </TouchableOpacity>
@@ -65,10 +63,6 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
     }
 
     useEffect(() => {
-        dispatch(getChatMessages(chatId))
-    }, [chatId])
-
-    useEffect(() => {
         toggleChangeMode()
     }, [chat])
 
@@ -76,7 +70,11 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
         <View style={styles.container}>
             {chat && <MessagesContainer chat={chat} toggleChangeMode={toggleChangeMode}/>}
 
-            <MessageForm chatId={chatId} editedMessage={editedMessage} toggleEditMode={() => toggleChangeMode()}/>
+            <MessageForm
+                chatId={chatId}
+                editedMessage={editedMessage}
+                toggleEditMode={() => toggleChangeMode()}
+            />
         </View>
     </View>
 }

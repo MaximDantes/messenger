@@ -53,7 +53,7 @@ class WebSocketApi {
         this.deleteSubscribers.push(callback)
     }
 
-    send(message: string, chatId: number, clientSideId: number, files: string[]) {
+    send(message: string, chatId: number, clientSideId: number, files: string[], articles: number[]) {
         this.ws?.send(JSON.stringify({
             message: {
                 text: message,
@@ -78,11 +78,13 @@ class WebSocketApi {
         this.ws = new WebSocket(`wss://${config.serverAddress}/ws/chat/?access=${this._token}`)
         this.ws.addEventListener('close', this.closeHandler)
         this.ws.addEventListener('message', this.messageReceivedHandler)
+        console.log('ws opened')
     }
 
     private closeHandler() {
         //TODO reconnect
-        console.log('ws closed')
+        console.error('ws closed')
+        this.createChannel?.()
     }
 
     private messageReceivedHandler = (e: MessageEvent) => {

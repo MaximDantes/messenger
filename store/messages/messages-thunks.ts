@@ -34,7 +34,7 @@ export const startMessagesListening = (): Thunk => async (dispatch) => {
     websocketApi.subscribeOnDelete(deleteMessageHandlerCreator(dispatch))
 }
 
-export const sendMessage = (message: string, chatId: number, userId: number, files: IFile[]): Thunk =>
+export const sendMessage = (message: string, chatId: number, userId: number, files: IFile[], articles: number[]): Thunk =>
     async (dispatch) => {
         try {
             const clientSideId = store.getState().messages.clientSideId
@@ -43,6 +43,7 @@ export const sendMessage = (message: string, chatId: number, userId: number, fil
 
             files.map(item => preloadFiles.push(item))
 
+            //TODO preview sent articles
             const profile = store.getState().profile.profile
             profile && dispatch(messageSent({
                 id: clientSideId,
@@ -71,7 +72,7 @@ export const sendMessage = (message: string, chatId: number, userId: number, fil
 
             const filesId = await getFilesId()
 
-            websocketApi.send(message, chatId, clientSideId, filesId)
+            websocketApi.send(message, chatId, clientSideId, filesId, articles)
         } catch (e) {
             console.error('send message', e)
         }

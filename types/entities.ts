@@ -45,10 +45,20 @@ export interface IProfile {
     readonly id: number,
     readonly firstName: string
     readonly lastName: string
-    readonly email: string
     readonly avatar: string
-    readonly specialityId: number
-    readonly courseId: number
+    readonly phonePublicity: boolean
+    readonly email: string
+    readonly speciality: number
+    readonly year: number
+    readonly phoneNumber: string
+    readonly groupName: GroupName
+}
+
+export interface IProfileInfo {
+    readonly firstName: string
+    readonly lastName: string
+    readonly phonePublicity: boolean
+    readonly phoneNumber: string
 }
 
 export interface IUser {
@@ -58,6 +68,12 @@ export interface IUser {
     readonly firstName: string
     readonly lastName: string
     readonly avatar: string
+}
+
+export interface ITeacher {
+    readonly email: string
+    readonly firstName: string
+    readonly lastName: string
 }
 
 export interface IFile {
@@ -74,14 +90,27 @@ export interface IFile {
 export interface IArticle {
     readonly id: number
     readonly title: string
-    readonly description: string
+    readonly text: string
     readonly files: IFile[]
-    readonly specialityId: number
-    readonly courseId: number
-    readonly teacherId: number
+    readonly speciality: number
+    readonly year: number
+    readonly teacher: number
+}
+
+export interface IArticlePreview {
+    readonly id: number
+    readonly title: string
 }
 
 export interface ISpeciality {
-    readonly id: number,
+    readonly id: number
     readonly abbreviation: string
+    readonly years?: number
 }
+
+export interface ISubject {
+    readonly id: number
+    readonly title: string
+}
+
+export type GroupName = 'teacher' | 'student'

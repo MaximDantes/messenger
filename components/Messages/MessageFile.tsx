@@ -1,49 +1,46 @@
 import React from 'react'
-import {ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
-import {FileType, isFileTypeImage} from '../../types/file-types'
-import FeatherIcon from 'react-native-vector-icons/Feather'
+import {ImageBackground, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {isFileTypeImage} from '../../types/file-types'
 import File from '../common/File'
 import {IFile} from '../../types/entities'
 
 type Props = {
     file: IFile
     variant: 'large' | 'small'
+    isSingle: boolean
     showImages(): void
-    showFile(): void
 }
 
 const MessageFormFile: React.FC<Props> = (props) => {
     const isImage = isFileTypeImage(props.file.fileType)
 
-    const newFileName = (props.file.file.length < 30) ? props.file.file :
-        props.file.file.slice(0, 10) + '...' + props.file.file.slice(-10)
+    const itemStyle = props.isSingle && isImage ? styles.singleContainer :
+        props.variant === 'large' ? styles.largeImage : styles.smallImage
 
-    return <TouchableOpacity
+    return <View
         style={props.variant === 'large' ? styles.largeContainer : styles.smallContainer}
-        onPress={isImage ? props.showImages : props.showFile}
     >
-        {isImage
-            ?
-            <ImageBackground
-                style={props.variant === 'large' ? styles.largeImage : styles.smallImage}
-                source={{uri: props.file.file}}
+        <View style={itemStyle}>
+            <File
+                uri={props.file.file}
+                name={props.file.fileName}
+                onPress={isImage ? props.showImages : undefined}
             />
-            :
-            <View style={props.variant === 'large' ? styles.largeImage : styles.smallImage}>
-                <File uri={props.file.file} name={props.file.fileName}/>
-            </View>
-        }
-    </TouchableOpacity>
+        </View>
+    </View>
 }
 
 const styles = StyleSheet.create({
+    singleContainer: {
+        minWidth: 250,
+        minHeight: 250,
+    },
+
     largeContainer: {
-        // width: '100%',
         minWidth: 150,
     },
 
     smallContainer: {
-        // width: '100%',
         minWidth: 100,
     },
 

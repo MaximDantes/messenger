@@ -1,5 +1,5 @@
 import axiosInstance from './api'
-import {IProfile} from '../types/entities'
+import {IProfile, IProfileInfo} from '../types/entities'
 import {snakeToCamel} from '../utilits/case-convert'
 import {DocumentResult} from 'expo-document-picker'
 import {Platform} from 'react-native'
@@ -11,21 +11,23 @@ const profileApi = {
         return {
             data: {
                 ...snakeToCamel<IProfile>(response.data),
-                courseId: 1,
-                specialityId: 1,
+                year: 1,
+                speciality: 1,
             } as IProfile,
             status: response.status
         }
     },
 
-    edit: async (firstName: string, lastName: string) => {
+    edit: async (profileInfo: IProfileInfo) => {
         const response = await axiosInstance.patch('users/me/', {
-            first_name: firstName,
-            last_name: lastName
+            first_name: profileInfo.firstName,
+            last_name: profileInfo.lastName,
+            phone_number: profileInfo.phoneNumber,
+            phone_publicity: profileInfo.phonePublicity,
         })
 
         return {
-            data: snakeToCamel<{ firstName: string, lastName: string }>(response.data),
+            data: snakeToCamel<IProfileInfo>(response.data),
             status: response.status
         }
     },

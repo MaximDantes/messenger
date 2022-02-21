@@ -18,7 +18,6 @@ const Avatar: React.FC<Props> = (props) => {
         props.setFile(pickedFile)
     }
 
-
     return <>
         {props.editMode ?
             <TouchableOpacity onPress={pickFile}>

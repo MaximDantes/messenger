@@ -3,6 +3,7 @@ import {Thunk} from './profile-reducer'
 import profileApi from '../../api/profile-api'
 import {DocumentResult} from 'expo-document-picker'
 import {statusCodes} from '../../types/status-codes'
+import {IProfileInfo} from '../../types/entities'
 
 export const getProfile = (): Thunk => async (dispatch) => {
     try {
@@ -20,14 +21,14 @@ export const getProfile = (): Thunk => async (dispatch) => {
     }
 }
 
-export const editProfile = (firstName: string, lastName: string): Thunk => async (dispatch) => {
+export const editProfile = (profileInfo: IProfileInfo): Thunk => async (dispatch) => {
     try {
         dispatch(fetchingStateChanged(true))
 
-        const response = await profileApi.edit(firstName, lastName)
+        const response = await profileApi.edit(profileInfo)
 
         if (response.status === statusCodes.success) {
-            dispatch(profileEdited(response.data.firstName, response.data.lastName))
+            dispatch(profileEdited(profileInfo))
         }
     } catch (e) {
         console.error('edit profile', e)
