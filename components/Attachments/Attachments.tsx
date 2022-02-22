@@ -39,7 +39,8 @@ const Attachments: React.FC<ScreenProps<'ImagesAttachments'>> = (props) => {
     }
 
     const onBottomReached = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-        if (e.nativeEvent.layoutMeasurement.height + e.nativeEvent.contentOffset.y + 50 > e.nativeEvent.contentSize.height) {
+        if (e.nativeEvent.layoutMeasurement.height + e.nativeEvent.contentOffset.y + 50 >
+            e.nativeEvent.contentSize.height) {
             dispatch(getFiles(chatId, type))
         }
     }

@@ -9,6 +9,8 @@ const messagesApi = {
 
         if (cursor) {
             url += `?cursor=${cursor}`
+        } else {
+            url += '/'
         }
 
         const response = await axiosInstance.get(url)

@@ -11,8 +11,6 @@ const profileApi = {
         return {
             data: {
                 ...snakeToCamel<IProfile>(response.data),
-                year: 1,
-                speciality: 1,
             } as IProfile,
             status: response.status
         }

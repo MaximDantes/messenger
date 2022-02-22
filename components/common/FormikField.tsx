@@ -7,19 +7,18 @@ type Props = {
     error?: string
     style?: StyleProp<TextStyle>
     keyboardType?: KeyboardTypeOptions
+    multiline?: boolean
+    numberOfLines?: number
     onChangeText(text: string): void
 }
 
-const FormikField: React.FC<Props> = (props) => {
+const FormikField: React.FC<Props> = ({error, style, ...props}) => {
     return <View>
         <TextInput
-            value={props.value}
-            onChangeText={props.onChangeText}
-            placeholder={props.placeholder}
-            style={[styles.input, props.style, !!props.error && styles.errorInput]}
-            keyboardType={props.keyboardType}
+            {...props}
+            style={[styles.input, style, !!error && styles.errorInput]}
         />
-        {!!props.error && <Text style={styles.errorText}>{props.error}</Text>}
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
     </View>
 }
 

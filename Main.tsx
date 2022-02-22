@@ -24,6 +24,7 @@ import MembersScreen from './screens/MembersScreen'
 import ChangePasswordScreen from './screens/ChangePasswordScreen'
 import LibrarySubjectsScreen from './screens/LibrarySubjectsScreen'
 import LibraryArticlesScreen from './screens/LibraryArticlesScreen'
+import ArticleFormScreen from './screens/ArticleFormScreen'
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>()
 const Stack = createNativeStackNavigator<StackNavigatorParamList>()
@@ -88,9 +89,8 @@ const Main: React.FC = () => {
                         <Stack.Screen name={'Images'} component={ImagesScreen}/>
                         <Stack.Screen name={'Attachments'} component={AttachmentsScreen} options={{title: 'Вложения'}}/>
                         <Stack.Screen name={'Article'} component={ArticleScreen}/>
-                        {/*<Stack.Screen name={'LibraryYears'} component={LibraryYearsScreen}/>*/}
-                        {/*<Stack.Screen name={'LibrarySubjects'} component={LibrarySubjectsScreen}/>*/}
-                        {/*<Stack.Screen name={'LibraryArticles'} component={LibraryArticlesScreen}/>*/}
+                        <Stack.Screen name={'ArticleForm'} component={ArticleFormScreen}
+                                      options={{title: 'Добавить запись'}}/>
                         <Stack.Screen name={'Members'} component={MembersScreen}/>
                         <Stack.Screen options={{title: 'Изменение пароля'}} name={'ChangePassword'}
                                       component={ChangePasswordScreen}/>

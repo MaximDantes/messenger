@@ -18,6 +18,7 @@ const LibraryScreen: React.FC<ScreenProps<'Library'>> = () => {
 
     useEffect(() => {
         if (profile) {
+            console.log(profile)
             //TODO speciality name
             navigation.navigate('LibrarySubjects', {year: profile.year, speciality: {id: profile.speciality, abbreviation: 'TODO'}})
         }

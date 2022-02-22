@@ -9,3 +9,5 @@ export const selectSharedArticle = (state: State) => state.articles.sharedArticl
 
 export const selectIsArticleInSharing = (id: number) => (state: State) => !!state.articles.sharedArticles
     .find(item => item.id === id)
+
+export const selectArticlesFetching = (state: State) => state.articles.isFetching

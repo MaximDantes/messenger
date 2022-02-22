@@ -1,5 +1,5 @@
 import {RouteProp} from '@react-navigation/native'
-import {IArticlePreview, ISpeciality, ISubject} from './entities'
+import {IArticle, IArticlePreview, ISpeciality, ISubject} from './entities'
 import {NativeStackNavigationProp} from '@react-navigation/native-stack'
 import {BottomTabNavigationProp} from '@react-navigation/bottom-tabs'
 
@@ -11,9 +11,7 @@ export type StackNavigatorParamList = {
     Auth: undefined,
     Attachments: { id: number },
     Article: { articlePreview: IArticlePreview },
-    // LibraryYears: { speciality: ISpeciality },
-    // LibrarySubjects: { speciality: ISpeciality, year: number }
-    // LibraryArticles: { specialityId: number, year: number, subject: ISubject }
+    ArticleForm: { subjectId?: number, specialityId?: number, year?: number, editedArticle?: IArticle }
     Members: { chatId: number, chatName: string },
     ChangePassword: { recoveryMode: boolean },
 }

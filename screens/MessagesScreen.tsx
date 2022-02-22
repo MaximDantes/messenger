@@ -33,9 +33,7 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
         if (remove) {
             navigation.setOptions({
                 headerRight: () => (
-                    <TouchableOpacity
-                        onPress={remove}
-                    >
+                    <TouchableOpacity onPress={remove}>
                         <AntDesignIcon name={'delete'} color={'#0976FF'} size={22} style={headerStyles.icon}/>
                     </TouchableOpacity>
 
@@ -66,7 +64,7 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
         toggleChangeMode()
     }, [chat])
 
-    return <View style={screenStyles.container}>
+    return <View style={[screenStyles.container, styles.container]}>
         <View style={styles.container}>
             {chat && <MessagesContainer chat={chat} toggleChangeMode={toggleChangeMode}/>}
 
@@ -81,9 +79,7 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center',
         height: '100%',
         width: '100%',
     },

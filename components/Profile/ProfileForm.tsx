@@ -1,5 +1,5 @@
-import {Button, StyleSheet, Text, TextInput, View} from 'react-native'
-import React, {useState} from 'react'
+import {Button, StyleSheet, Text, View} from 'react-native'
+import React, {useEffect, useState} from 'react'
 import {useNavigation} from '@react-navigation/native'
 import {NavigationProps} from '../../types/screens'
 import {Formik} from 'formik'
@@ -8,7 +8,7 @@ import {editProfile} from '../../store/profile/profile-thunks'
 import {IProfileInfo} from '../../types/entities'
 import * as Yup from 'yup'
 import FormikField from '../common/FormikField'
-import FormikPhoneField from '../common/FormikPhoneField'
+import CheckBox from '../common/CheckBox'
 
 type Props = {
     firstName: string
@@ -37,9 +37,15 @@ const ProfileForm: React.FC<Props> = (props) => {
     const navigation = useNavigation<NavigationProps>()
     const dispatch = useDispatch()
 
-    const onSubmit = (values: IProfileInfo) => {
-        dispatch(editProfile(values))
+    const [isChecked, setIsChecked] = useState(false)
+    useEffect(() => {
+        setIsChecked(props.phonePublicity)
+    }, [props.phonePublicity])
 
+    const onSubmit = (values: Omit<IProfileInfo, 'phonePublicity'>) => {
+        dispatch(editProfile({...values, phonePublicity: isChecked}))
+
+        props.saveAvatar()
         props.disableEditMode()
     }
 
@@ -51,7 +57,6 @@ const ProfileForm: React.FC<Props> = (props) => {
                         firstName: props.firstName,
                         lastName: props.lastName,
                         phoneNumber: props.phoneNumber,
-                        phonePublicity: props.phonePublicity
                     }}
                     onSubmit={onSubmit}
                     validationSchema={validationSchema}
@@ -72,19 +77,29 @@ const ProfileForm: React.FC<Props> = (props) => {
                                 error={formik.errors.lastName}
                                 style={styles.input}
                             />
-                            <FormikPhoneField
+                            <FormikField
                                 value={formik.values.phoneNumber}
                                 onChangeText={formik.handleChange('phoneNumber')}
                                 placeholder={'Телефон'}
                                 error={formik.errors.phoneNumber}
                                 style={styles.input}
+                                keyboardType={'phone-pad'}
+                            />
+                            <CheckBox
+                                checked={isChecked}
+                                onPress={setIsChecked}
+                                text={'phone publicity'}
                             />
 
                             <Button title={'Изменить пароль'}
                                     onPress={() => navigation.navigate('ChangePassword', {recoveryMode: false})}/>
 
                             <View style={styles.buttonsContainer}>
-                                <Button title={'Сохранить'} onPress={props.saveAvatar}/>
+                                <Button
+                                    title={'Сохранить'}
+                                    onPress={formik.submitForm}
+                                    disabled={formik.isSubmitting}
+                                />
                                 <Button title={'Отмена'} onPress={props.disableEditMode}/>
                             </View>
                         </View>
@@ -114,6 +129,11 @@ const styles = StyleSheet.create({
 
     input: {
         marginVertical: 5,
+    },
+
+    checkBox: {
+        borderColor: '#f00',
+        backgroundColor: '#f00',
     },
 
     buttonsContainer: {

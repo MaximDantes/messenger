@@ -11,32 +11,9 @@ type Props = {
 }
 
 const FormikPhoneField: React.FC<Props> = (props) => {
-    const onChangeText = (text: string) => {
-        if (text.length === 2) {
-            props.onChangeText(`(${text}) `)
-            return
-        }
-
-        if (text.length === 8) {
-            props.onChangeText(`${text} `)
-            return
-        }
-
-        if (text.length === 11) {
-            props.onChangeText(`${text} `)
-            return
-        }
-
-        if (text.length > 14) {
-            return
-        }
-
-        props.onChangeText(text)
-    }
-
     return <FormikField
         value={props.value}
-        onChangeText={onChangeText}
+        onChangeText={props.onChangeText}
         error={props.error}
         style={props.style}
         placeholder={props.placeholder}

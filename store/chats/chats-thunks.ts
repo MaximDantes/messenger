@@ -3,6 +3,7 @@ import {chatsApi} from '../../api/chats-api'
 import {chatMembersReceived, chatsReceived, cursorChanged, lastMessageChanged} from './chats-actions'
 import {IMessage} from '../../types/entities'
 import {statusCodes} from '../../types/status-codes'
+import handleTokenExpired from '../handle-token-expired'
 
 export const getChats = (userId: number): Thunk => async (dispatch) => {
     try {
@@ -11,6 +12,7 @@ export const getChats = (userId: number): Thunk => async (dispatch) => {
         dispatch(chatsReceived(response))
     } catch (e) {
         console.error('get chats', e)
+        await handleTokenExpired(e, () => dispatch(getChats(userId)))
     }
 }
 

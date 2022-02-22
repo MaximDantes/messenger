@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from 'react'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
-import {getFileType, isFileTypeImage, isFileTypeOpenable} from '../../types/file-types'
+import {getFileName, getFileType, isFileTypeImage, isFileTypeOpenable} from '../../types/file-types'
 import {downloadFile} from '../../utilits/download-file'
 import {NavigationProps} from '../../types/screens'
 import {Animated} from 'react-native'
@@ -17,7 +17,7 @@ type Props = {
 }
 
 const File: React.FC<Props> = (props) => {
-    const name = props.name || getFileType(props.uri)
+    const name = props.name || getFileName(props.uri)
     const isImage = isFileTypeImage(getFileType(name))
 
     const newFileName = useMemo(() => name.length < 30 ? name : name.slice(0, 10) + '...' + name.slice(-10), [name])

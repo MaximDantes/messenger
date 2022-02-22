@@ -69,12 +69,10 @@ export const checkAuth = (): Thunk => async (dispatch) => {
 
         const response = await authApi.refreshToken()
 
-        if (response.status === statusCodes.success) {
-            dispatch(getProfile())
-            dispatch(authorized(true))
-            dispatch(tokenReceived(response.data.access))
-            dispatch(startMessagesListening())
-        }
+        dispatch(getProfile())
+        dispatch(authorized(true))
+        dispatch(tokenReceived(response.data.access))
+        dispatch(startMessagesListening())
     } catch (e) {
         console.error('check auth', e)
     } finally {

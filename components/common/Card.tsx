@@ -20,9 +20,9 @@ const styles = StyleSheet.create({
         width: '100%',
         padding: 7,
         borderRadius: 5,
-        backgroundColor: '#E0EFFF',
+        backgroundColor: '#d7e9ff',
         borderWidth: 1,
-        borderColor: '#bbbbbbff',
+        borderColor: '#b4daff',
         alignItems: 'center',
         justifyContent: 'center',
     }

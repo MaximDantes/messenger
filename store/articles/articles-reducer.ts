@@ -6,6 +6,7 @@ const initialState = {
     articlesPreviews: [] as IArticlePreview[],
     articles: [] as IArticle[],
     sharedArticles: [] as IArticlePreview[],
+    isFetching: false
 }
 
 const articlesReducer = (state = initialState, action: Action): typeof initialState => {
@@ -22,6 +23,20 @@ const articlesReducer = (state = initialState, action: Action): typeof initialSt
                 articles: [...state.articles, action.payload]
             }
 
+        case 'articles/ARTICLE_REMOVED':
+            return {
+                ...state,
+                articles: state.articles.filter(item => item.id !== action.payload),
+                articlesPreviews: state.articlesPreviews.filter(item => item.id !== action.payload),
+                sharedArticles: state.sharedArticles.filter(item => item.id !== action.payload)
+            }
+
+        case 'articles/ARTICLE_CREATED':
+            return {
+                ...state,
+                articlesPreviews: [...state.articlesPreviews, action.payload]
+            }
+
         case 'articles/SHARED_ARTICLE_CHANGED':
             return {
                 ...state,
@@ -32,6 +47,12 @@ const articlesReducer = (state = initialState, action: Action): typeof initialSt
             return {
                 ...state,
                 sharedArticles: state.sharedArticles.filter(item => item.id !== action.payload)
+            }
+
+        case 'articles/FETCHING_STATE_CHANGED':
+            return {
+                ...state,
+                isFetching: action.payload
             }
 
         default:
