@@ -37,6 +37,12 @@ const articlesReducer = (state = initialState, action: Action): typeof initialSt
                 articlesPreviews: [...state.articlesPreviews, action.payload]
             }
 
+        case 'articles/ARTICLE_EDITED':
+            return {
+                ...state,
+                articles: [...state.articles.filter(item => item.id !== action.payload.id), action.payload]
+            }
+
         case 'articles/SHARED_ARTICLE_CHANGED':
             return {
                 ...state,
@@ -47,6 +53,12 @@ const articlesReducer = (state = initialState, action: Action): typeof initialSt
             return {
                 ...state,
                 sharedArticles: state.sharedArticles.filter(item => item.id !== action.payload)
+            }
+
+        case 'articles/CLEAR_SHARING':
+            return {
+                ...state,
+                sharedArticles: []
             }
 
         case 'articles/FETCHING_STATE_CHANGED':

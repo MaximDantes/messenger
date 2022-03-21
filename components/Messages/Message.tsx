@@ -1,7 +1,7 @@
 import {StyleSheet, Text, TouchableOpacity, Vibration, View} from 'react-native'
 import React from 'react'
-import {IFile} from '../../types/entities'
-import MessageFiles from './MessageFiles'
+import {IArticlePreview, IFile} from '../../types/entities'
+import MessageAttachments from './MessageAttachments'
 import {MessagePreloader} from '../common/Preloader'
 import {getPrintTimeFormat} from '../../utilits/format-date'
 
@@ -9,6 +9,7 @@ type Props = {
     text: string
     time: Date
     files: IFile[]
+    articles: IArticlePreview[]
     sentByCurrentUser: boolean
     inSending: boolean
     change(): void
@@ -39,7 +40,7 @@ const Message: React.FC<Props> = (props) => {
         >
             {!!props.text && <Text>{props.text}</Text>}
 
-            <MessageFiles files={props.files}/>
+            <MessageAttachments files={props.files} articles={props.articles}/>
 
             <View style={dateContainerStyles}>
                 <Text style={dateTextStyles}>{getPrintTimeFormat(props.time)}</Text>
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     },
 
     message: {
-        maxWidth: '90%',
+        maxWidth: 310,
         minWidth: 50,
         borderRadius: 8,
         padding: 5,

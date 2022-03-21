@@ -73,19 +73,17 @@ const MessagesContainer: React.FC<Props> = (props) => {
         }
     }
 
-    const onMessageRemove = (id: number) => {
-        dispatch(removeMessage(id))
+    const onMessageRemove = (id: number, chatId: number) => {
+        dispatch(removeMessage(id, chatId))
         props.toggleChangeMode()
     }
 
     const changeMessage = (message: IMessage) => {
-        props.toggleChangeMode(message, () => onMessageRemove(message.id))
+        props.toggleChangeMode(message, () => onMessageRemove(message.id, props.chat.id))
     }
 
     return (isReceivingMessages && messages.length === 0) ?
-
         <Preloader/>
-
         :
         <ScrollView
             style={styles.container}
@@ -120,6 +118,7 @@ const MessagesContainer: React.FC<Props> = (props) => {
                         text={item.text}
                         time={item.date}
                         files={item.files}
+                        articles={item.articles}
                         inSending={item.inSending || false}
                         sentByCurrentUser={item.user.id === profile?.id}
                         change={() => changeMessage(item)}
@@ -135,6 +134,7 @@ const styles = StyleSheet.create({
     },
 
     userContainer: {
+        marginTop: 5,
         marginHorizontal: 5,
         flexDirection: 'row',
         alignItems: 'center'

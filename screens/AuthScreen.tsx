@@ -1,94 +1,112 @@
-import React, {useEffect, useState} from 'react'
-import {Button, KeyboardAvoidingView, StyleSheet, Text, TextInput, View} from 'react-native'
+import React from 'react'
+import {Button, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {screenStyles} from '../styles/common'
 import {useDispatch, useSelector} from 'react-redux'
 import {auth} from '../store/auth/auth-thunks'
-import {ScreenProps} from '../types/screens'
+import {NavigationProps, ScreenProps} from '../types/screens'
 import {selectIsAuthError} from '../store/auth/auth-selectors'
-import PasswordStrengthValidator from '../components/Auth/PasswordStrengthValidator'
-import PasswordInput from '../components/common/PasswordInput'
+import {useNavigation} from '@react-navigation/native'
+import {Formik} from 'formik'
+import * as Yup from 'yup'
+import FormikField from '../components/common/FormikField'
+
+const validationSchema = Yup.object().shape({
+    email: Yup.string()
+        .required('Поле обязательно для заполнения'),
+    password: Yup.string()
+        .required('Поле обязательно для заполнения'),
+})
 
 const AuthScreen: React.FC<ScreenProps<'Auth'>> = () => {
     const dispatch = useDispatch()
+    const navigation = useNavigation<NavigationProps>()
 
     const isError = useSelector(selectIsAuthError)
 
-    useEffect(() => {
-        if (isError) {
-            setEmail('')
-            setPassword('')
-        }
-    }, [isError])
-
-    const login = () => {
-        if (email && password) {
-            dispatch(auth(email, password))
-        }
+    const onSubmit = (values: { email: string, password: string }) => {
+        dispatch(auth(values.email, values.password))
     }
 
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
+    return <View style={[screenStyles.container, styles.container]}>
+        <Formik
+            initialValues={{
+                email: '',
+                password: '',
+            }}
+            onSubmit={onSubmit}
+            validationSchema={validationSchema}
+        >
+            {(formik) => (
+                <View style={styles.formContainer}>
+                    <View/>
 
-    //TODO keyboard avoid
-    return <KeyboardAvoidingView style={[screenStyles.container, styles.container]}>
-        <View style={styles.itemContainer}>
-            <TextInput
-                style={styles.input}
-                placeholder={'Логин'}
-                value={email}
-                onChangeText={setEmail}
-            />
-        </View>
+                    <View>
+                        <View style={styles.inputContainer}>
+                            <FormikField
+                                value={formik.values.email}
+                                onChangeText={formik.handleChange('email')}
+                                placeholder={'Логин'}
+                                error={formik.touched.email ? formik.errors.email : undefined}
+                            />
+                        </View>
+                        <View style={styles.inputContainer}>
 
-        <View style={styles.itemContainer}>
-            <PasswordInput
-                value={password}
-                onChangeText={setPassword}
-                placeholder={'Пароль'}
-            />
-        </View>
+                            <FormikField
+                                value={formik.values.password}
+                                onChangeText={formik.handleChange('password')}
+                                placeholder={'Пароль'}
+                                error={formik.touched.password ? formik.errors.password : undefined}
+                                password={true}
+                            />
+                        </View>
 
-        <View style={styles.itemContainer}>
-            <Text style={isError ? styles.error : styles.hidden}>
-                Неверно введен логин или пароль
-            </Text>
-        </View>
+                        <View style={styles.buttonContainer}>
+                            <Button title={'Вход'} onPress={formik.submitForm}/>
+                        </View>
+                    </View>
 
-        <View style={[styles.itemContainer, styles.buttonContainer]}>
-            <Button title={'Вход'} onPress={login}/>
-        </View>
-    </KeyboardAvoidingView>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('ForgotPassword', {email: formik.values.email})}>
+                        <Text style={styles.text}>Забыли пароль?</Text>
+                    </TouchableOpacity>
+                </View>
+            )}
+        </Formik>
+    </View>
 }
 
 const styles = StyleSheet.create({
     container: {
         justifyContent: 'center',
+        paddingVertical: 15,
+    },
+
+    formContainer: {
+        flex: 1,
+        justifyContent: 'space-between',
         alignItems: 'center',
     },
 
-    itemContainer: {
-        width: '100%',
-        paddingVertical: 10,
-        paddingHorizontal: 40,
-        flexDirection: 'row',
-        justifyContent: 'center',
+    inputContainer: {
+        width: 280,
+        marginVertical: 5,
     },
 
     buttonContainer: {
-        maxWidth: 200,
+        width: 120,
+        marginVertical: 15,
+        alignSelf: 'center',
     },
 
-    input: {
-        flex: 1,
+    forgetPassword: {
+        alignSelf: 'flex-end',
     },
 
-    error: {
-        color: '#f00',
-    },
-
-    hidden: {
-        opacity: 0
-    },
+    text: {
+        textAlign: 'center',
+        color: '#2195F2',
+        fontSize: 16,
+    }
 })
 
 export default AuthScreen

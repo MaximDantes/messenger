@@ -1,11 +1,10 @@
 import React, {useEffect} from 'react'
 import {Dimensions, Image, StyleSheet, TouchableOpacity, View} from 'react-native'
-import {RouteProp, useNavigation} from '@react-navigation/native'
+import {useNavigation} from '@react-navigation/native'
 import Swiper from 'react-native-web-swiper'
 import {NavigationProps, ScreenProps} from '../types/screens'
-import {getFileName} from '../types/file-types'
-import {downloadFile} from '../utilits/download-file'
 import FeatherIcon from 'react-native-vector-icons/Feather'
+import {downloadFile} from '../utilits/download-file'
 
 const ImagesScreen: React.FC<ScreenProps<'Images'>> = (props) => {
     const paramsImages = props.route.params.images
@@ -13,26 +12,31 @@ const ImagesScreen: React.FC<ScreenProps<'Images'>> = (props) => {
 
     const navigation = useNavigation<NavigationProps>()
 
+    useEffect(() => {
+        setTitle(position)
+    }, [paramsImages, position])
+
     const setTitle = (index: number) => {
         navigation.setOptions({
-            title: `${index}/${paramsImages.length}`,
+            title: `${index + 1}/${paramsImages.length}`,
 
             headerRight: () => (
-                <TouchableOpacity onPress={() => downloadFile(paramsImages[position])}>
+                <TouchableOpacity onPress={() => downloadFile(paramsImages[index])}>
                     <FeatherIcon name={'download'} color={'#2196F3'} size={22}/>
                 </TouchableOpacity>
             )
         })
     }
 
-    useEffect(() => {
-        setTitle(position + 1)
-    }, [paramsImages, position])
+    const onIndexChange = (index: number) => {
+        setTitle(index)
+    }
 
+    //TODO zoom
     return <View style={styles.container}>
         <Swiper
             controlsEnabled={false}
-            onIndexChanged={index => setTitle(index + 1)}
+            onIndexChanged={onIndexChange}
             from={position}
         >
             {paramsImages.map((item, index) => (
@@ -59,7 +63,13 @@ const styles = StyleSheet.create({
         width: win.width,
         height: '100%',
         resizeMode: 'contain',
-    }
+    },
+
+    download: {
+        overflow: 'hidden',
+        maxWidth: 300,
+        height: 300,
+    },
 })
 
 export default ImagesScreen

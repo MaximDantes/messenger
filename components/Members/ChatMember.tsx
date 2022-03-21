@@ -6,7 +6,7 @@ type Props = {
     member: IUser
 }
 
-const Member: React.FC<Props> = (props) => {
+const ChatMember: React.FC<Props> = (props) => {
     const [showInfo, setShowInfo] = useState(false)
 
     useEffect(() => {
@@ -26,7 +26,7 @@ const Member: React.FC<Props> = (props) => {
 
         {showInfo && <View style={styles.infoContainer}>
             <Text style={styles.infoText}>{props.member.email}</Text>
-            <Text style={styles.infoText}>{props.member.phone}</Text>
+            <Text style={styles.infoText}>{props.member.phoneNumber}</Text>
         </View>}
     </TouchableOpacity>
 }
@@ -62,4 +62,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default Member
+export default ChatMember

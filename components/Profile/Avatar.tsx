@@ -25,7 +25,7 @@ const Avatar: React.FC<Props> = (props) => {
                     source={
                         (props.file && props.file.type === 'success' && props.file.uri)
                             ? {uri: props.file.uri}
-                            : props.source ? {uri: props.source} : defaultAvatar}
+                            : {uri: props.source}}
                     style={styles.image}
                 >
                     {props.editMode &&

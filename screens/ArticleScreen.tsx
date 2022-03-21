@@ -1,6 +1,6 @@
 import {NavigationProps, ScreenProps} from '../types/screens'
 import React, {useEffect} from 'react'
-import {Alert, Dimensions, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Alert, Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
 import {useNavigation} from '@react-navigation/native'
 import {useDispatch, useSelector} from 'react-redux'
 import {selectArticle, selectArticlesFetching, selectIsArticleInSharing} from '../store/articles/articles-selectors'
@@ -45,6 +45,12 @@ const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
 
     const remove = () => {
         if (article) {
+            if (Platform.OS === 'web') {
+                dispatch(removeArticle(article.id))
+                navigation.goBack()
+                return
+            }
+
             Alert.alert('Удаление', 'Удалить запись?', [{
                 text: 'OK',
                 onPress: () => {
@@ -110,7 +116,11 @@ const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
                     </View>
 
                     <View style={styles.filesContainer}>
-                        <Files files={article.files} itemWrapper={() => <View style={styles.file}/>}/>
+                        <Files
+                            files={article.files}
+                            downloadingDisabled={true}
+                            showingDisabled={true}
+                        />
                     </View>
                 </>
                 :
@@ -130,6 +140,8 @@ const styles = StyleSheet.create({
 
     filesContainer: {
         padding: 3,
+        flex: 1,
+        flexWrap: 'wrap',
         flexDirection: 'row',
     },
 

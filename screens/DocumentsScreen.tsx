@@ -1,5 +1,5 @@
 import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native'
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import WebView from 'react-native-webview'
 import {getFileName, getFileType} from '../types/file-types'
 import {useNavigation} from '@react-navigation/native'
@@ -13,12 +13,14 @@ const DocumentsScreen: React.FC<ScreenProps<'Documents'>> = (props) => {
 
     const navigation = useNavigation<NavigationProps>()
 
+    const [isDownloading, setIsDownloading] = useState(false)
+
     useEffect(() => {
         navigation.setOptions({
             title: name || getFileName(uri),
 
             headerRight: () => (
-                <TouchableOpacity onPress={() => downloadFile(uri)}>
+                <TouchableOpacity onPress={() => setIsDownloading(true)}>
                     <FeatherIcon name={'download'} color={'#2196F3'} size={22}/>
                 </TouchableOpacity>
             )
@@ -40,11 +42,23 @@ const DocumentsScreen: React.FC<ScreenProps<'Documents'>> = (props) => {
             ?
             <iframe src={source} style={styles.iframe}/>
             :
-        <WebView
-            source={{uri: source}}
-            startInLoadingState={true}
-            style={styles.container}
-        />}
+            <>
+                <WebView
+                    style={styles.container}
+                    startInLoadingState={true}
+                    source={{uri: source}}
+                />
+                {isDownloading &&
+                    <View style={styles.download}>
+                        <WebView
+                            originWhitelist={['*']}
+                            startInLoadingState={true}
+                            source={{html: `<a href='${uri}' download/> <script>document.querySelector('a').click()</script>`}}
+                        />
+                    </View>
+                }
+            </>
+        }
     </View>
 }
 
@@ -55,6 +69,12 @@ const styles = StyleSheet.create({
 
     iframe: {
         height: '100%'
+    },
+
+    download: {
+        overflow: 'hidden',
+        maxWidth: 0,
+        maxHeight: 0,
     },
 })
 

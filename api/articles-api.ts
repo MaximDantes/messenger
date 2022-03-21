@@ -20,9 +20,7 @@ const articlesApi = {
             url += `?teacher=${teacher}`
         }
 
-        const response = axiosInstance.get<IArticlePreview[]>(url)
-
-        return response
+        return axiosInstance.get<IArticlePreview[]>(url)
     },
 
     remove: async (articleId: number) => {
@@ -30,15 +28,13 @@ const articlesApi = {
     },
 
     create: async (title: string, text: string, subjectId: number, year: number, specialityId: number) => {
-        const response = await axiosInstance.post<IArticle>('wiki/article/', {
+        return await axiosInstance.post<IArticle>('wiki/article/', {
             title,
             text,
             subject: subjectId,
             year,
             speciality: specialityId
         })
-
-        return response
     },
 
     addFile: async (articleId: number, file: IFile) => {
@@ -55,6 +51,18 @@ const articlesApi = {
         }
 
         return await axiosInstance.post<IFile>(`wiki/article/${articleId}/files/`, formData)
+    },
+
+    removeFile: async (articleId: number, fileId: number) => {
+        return await axiosInstance.delete(`wiki/article/${articleId}/files/${fileId}`)
+    },
+
+    edit: async (articleId: number, title: string, text: string) => {
+        return  await axiosInstance.put<IArticle>('wiki/article/', {
+            id: articleId,
+            title,
+            text,
+        })
     }
 }
 

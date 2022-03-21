@@ -1,15 +1,16 @@
 import React from 'react'
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {StyleProp, StyleSheet, Text, TextStyle, TouchableOpacity, View, ViewStyle} from 'react-native'
 import EntypoIcon from 'react-native-vector-icons/Entypo'
 
 type Props = {
     checked: boolean
     onPress(checked: boolean): void
     text?: string
+    style?: StyleProp<ViewStyle>
 }
 
 const CheckBox: React.FC<Props> = (props) => {
-    return <View style={styles.container}>
+    return <View style={[styles.container, props.style]}>
         <TouchableOpacity
             onPress={() => props.onPress(!props.checked)}
             style={[styles.item, props.checked && styles.checkedContainer]}
@@ -17,7 +18,7 @@ const CheckBox: React.FC<Props> = (props) => {
             {props.checked && <EntypoIcon name={'check'} size={18} color={'#fff'}/>}
         </TouchableOpacity>
 
-        <Text>{props.text}</Text>
+        <Text style={props.style}>{props.text}</Text>
     </View>
 }
 

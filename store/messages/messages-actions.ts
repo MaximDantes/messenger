@@ -11,14 +11,24 @@ export const messageReceived = (message: IMessage) => ({
     payload: message
 } as const)
 
-export const messageDeleted = (id: number) => ({
+export const messageDeleted = (id: number, chatId: number) => ({
     type: 'messages/MESSAGE_DELETED',
-    payload: id
+    payload: {id, chatId}
+} as const)
+
+export const messageEdited = (message: IMessage) => ({
+    type: 'messages/MESSAGE_EDITED',
+    payload: message
 } as const)
 
 export const messageSent = (message: IMessage) => ({
     type: 'messages/MESSAGE_SENT',
     payload: message
+} as const)
+
+export const messageSendingStateChanged = (messageId: number, chatId: number, isSending: boolean) => ({
+    type: 'messages/MESSAGES_SENDING_STATE_CHANGED',
+    payload: {messageId, chatId, isSending}
 } as const)
 
 export const fetchingChanged = (value: boolean) => ({

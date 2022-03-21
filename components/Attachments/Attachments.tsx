@@ -1,9 +1,9 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useRef} from 'react'
 import {
     Button,
     Dimensions,
     Image, NativeScrollEvent,
-    NativeSyntheticEvent,
+    NativeSyntheticEvent, Platform,
     ScrollView,
     StyleSheet, Text,
     TouchableOpacity,
@@ -15,7 +15,7 @@ import {useNavigation} from '@react-navigation/native'
 import {getFiles} from '../../store/files/files-thunks'
 import File from './../common/File'
 import {NavigationProps, ScreenProps} from '../../types/screens'
-import {Preloader} from '../common/Preloader'
+import {MessagePreloader, Preloader} from '../common/Preloader'
 
 const Attachments: React.FC<ScreenProps<'ImagesAttachments'>> = (props) => {
     const type = props.route.params.type
@@ -27,12 +27,20 @@ const Attachments: React.FC<ScreenProps<'ImagesAttachments'>> = (props) => {
     const chatId = props.route.params.chatId
     const files = useSelector(selectFiles(type, chatId))
 
+    const scrollView = useRef<ScrollView>(null)
+
     useEffect(() => {
         //TODO set final files count
         if (files.length < 18) {
             dispatch(getFiles(chatId, type))
         }
     }, [chatId])
+
+    useEffect(() => {
+        if (files.length && isFetching) {
+            scrollView.current?.scrollToEnd({animated: true})
+        }
+    }, [isFetching])
 
     const showImages = (position: number) => {
         navigation.navigate('Images', {images: files.map(item => item.file), position})
@@ -45,11 +53,14 @@ const Attachments: React.FC<ScreenProps<'ImagesAttachments'>> = (props) => {
         }
     }
 
-    return isFetching
+    return (isFetching && files.length === 0)
         ?
         <Preloader/>
         :
-        <ScrollView onScrollEndDrag={onBottomReached}>
+        <ScrollView
+            onScrollEndDrag={onBottomReached}
+            ref={scrollView}
+        >
             <View style={styles.container}>
                 {files.map((item, index) => (
                     <View key={item.id} style={type === 'IMG' ? styles.imageItem : styles.fileItem}>
@@ -61,6 +72,10 @@ const Attachments: React.FC<ScreenProps<'ImagesAttachments'>> = (props) => {
                     </View>
                 ))}
             </View>
+
+            {isFetching && <View style={styles.preloaderContainer}><MessagePreloader/></View>}
+
+            {Platform.OS === 'web' && <Button title={'more'} onPress={() => dispatch(getFiles(chatId, type))}/>}
         </ScrollView>
 }
 
@@ -89,5 +104,9 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
-    }
+    },
+
+    preloaderContainer: {
+        paddingVertical: 7,
+    },
 })

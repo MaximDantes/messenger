@@ -8,12 +8,12 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import {useNavigation} from '@react-navigation/native'
 import {isFileTypeImage} from '../../types/file-types'
 import {selectProfile} from '../../store/profile/profile-selectors'
-import {sendMessage} from '../../store/messages/messages-thunks'
+import {editMessage, sendMessage} from '../../store/messages/messages-thunks'
 import {NavigationProps} from '../../types/screens'
-import {IFile, IMessage} from '../../types/entities'
+import {IArticlePreview, IFile, IMessage} from '../../types/entities'
 import {selectSharedArticle} from '../../store/articles/articles-selectors'
 import ArticlePreview from '../Articles/ArticlePreview'
-import {removeArticleFromSharing} from '../../store/articles/articles-actions'
+import {clearSharing, removeArticleFromSharing} from '../../store/articles/articles-actions'
 
 type Props = {
     chatId: number
@@ -27,6 +27,7 @@ const MessageForm: React.FC<Props> = (props) => {
 
     const [message, setMessage] = useState('')
     const [files, setFiles] = useState<IFile[]>([])
+    const [articles, setArticles] = useState<IArticlePreview[]>([])
 
     const sharedArticles = useSelector(selectSharedArticle)
     const user = useSelector(selectProfile)
@@ -35,9 +36,11 @@ const MessageForm: React.FC<Props> = (props) => {
         if (props.editedMessage) {
             setMessage(props.editedMessage.text)
             setFiles(props.editedMessage.files)
+            setArticles(props.editedMessage.articles)
         } else {
             setMessage('')
             setFiles([])
+            setArticles([])
         }
 
     }, [props.editedMessage])
@@ -46,13 +49,15 @@ const MessageForm: React.FC<Props> = (props) => {
         if (!props.editedMessage) {
             if (user && (message.trim() || files.length > 0)) {
                 dispatch(sendMessage(message.trim(), props.chatId,
-                    user.id, files, sharedArticles.map(item => item.id)))
+                    user.id, files, sharedArticles))
 
+                dispatch(clearSharing())
                 setMessage('')
                 setFiles([])
             }
         } else {
-            Alert.alert('message edited: ' + message, ' files count: ' + files.length)
+            dispatch(editMessage(props.editedMessage.id, props.editedMessage.chatId, message, files, articles))
+            dispatch(clearSharing())
             props.toggleEditMode()
         }
     }
@@ -92,6 +97,8 @@ const MessageForm: React.FC<Props> = (props) => {
     const renderItems = () => {
         let imagesIndex = -1
 
+        const mappedArticles = !!props.editedMessage ? articles : sharedArticles
+
         return [...files.map((item, index) => {
                 if (isFileTypeImage(item.fileType)) {
                     imagesIndex++
@@ -108,12 +115,18 @@ const MessageForm: React.FC<Props> = (props) => {
                     showFile={() => showFile(fileIndex)}
                 />
             }
-        ), ...sharedArticles.map(item => (
+        ), ...mappedArticles.map(item => (
             <MessageFormAttachment
                 key={item.id}
                 articlePreview={item}
                 type={'article'}
-                removeFile={() => dispatch(removeArticleFromSharing(item.id))}
+                removeFile={() => {
+                    if (props.editedMessage) {
+                        setArticles(articles.filter(article => article !== item))
+                    } else {
+                        dispatch(removeArticleFromSharing(item.id))
+                    }
+                }}
             />
         ))]
     }
@@ -125,12 +138,6 @@ const MessageForm: React.FC<Props> = (props) => {
                 <MaterialIcon name={'close'} color={'#666666'} size={22}/>
             </TouchableOpacity>
         </View>}
-
-        {sharedArticles.map((item, index) => (
-            <TouchableOpacity key={item.id + index}>
-                <ArticlePreview articlePreview={item}/>
-            </TouchableOpacity>
-        ))}
 
         <ScrollView horizontal={true}>
             {renderItems()}

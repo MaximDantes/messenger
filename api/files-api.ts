@@ -12,7 +12,7 @@ const filesApi = {
         }
 
         let url = `chat/${chatId}/files?file_type=${type}`
-        if (cursor) url += `&cursor=${cursor}`
+        if (cursor) url += `&cursor=${cursor.split('&')[0]}`
 
         const response = await axiosInstance.get(url)
 

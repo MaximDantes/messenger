@@ -2,7 +2,7 @@ import {ScrollView, StyleSheet, View} from 'react-native'
 import {screenStyles} from '../styles/common'
 import React, {useEffect} from 'react'
 import {NavigationProps, ScreenProps} from '../types/screens'
-import Member from '../components/Members/Member'
+import ChatMember from '../components/Members/ChatMember'
 import {useNavigation} from '@react-navigation/native'
 import {useDispatch, useSelector} from 'react-redux'
 import {getChatMembers} from '../store/chats/chats-thunks'
@@ -30,7 +30,7 @@ const MembersScreen: React.FC<ScreenProps<'Members'>> = (props) => {
     return <View style={[screenStyles.container, styles.container]}>
         <ScrollView>
             {members.map(item => (
-                <Member key={item.id} member={item}/>
+                <ChatMember key={item.id} member={item}/>
             ))}
         </ScrollView>
     </View>

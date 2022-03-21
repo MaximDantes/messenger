@@ -1,5 +1,15 @@
-import React from 'react'
-import {KeyboardTypeOptions, StyleProp, StyleSheet, Text, TextInput, TextStyle, View} from 'react-native'
+import React, {useState} from 'react'
+import {
+    KeyboardTypeOptions,
+    StyleProp,
+    StyleSheet,
+    Text,
+    TextInput,
+    TextStyle,
+    TouchableOpacity,
+    View
+} from 'react-native'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 type Props = {
     value: string
@@ -10,25 +20,48 @@ type Props = {
     multiline?: boolean
     numberOfLines?: number
     onChangeText(text: string): void
+    password?: boolean
 }
 
 const FormikField: React.FC<Props> = ({error, style, ...props}) => {
+    const [isPasswordVisible, setIsPasswordVisible] = useState(!props.password)
+
     return <View>
-        <TextInput
-            {...props}
-            style={[styles.input, style, !!error && styles.errorInput]}
-        />
+        <View style={[styles.inputContainer, !!error && styles.errorInput]}>
+            <TextInput
+                secureTextEntry={!isPasswordVisible}
+                {...props}
+                style={[styles.input, style]}
+            />
+
+            {props.password &&
+                <TouchableOpacity onPress={() => setIsPasswordVisible(prev => !prev)}>
+                    <Ionicons name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'} size={22}
+                              color={'#00000066'}/>
+                </TouchableOpacity>}
+        </View>
+
         {!!error && <Text style={styles.errorText}>{error}</Text>}
     </View>
 }
 
 const styles = StyleSheet.create({
-    input: {
+    inputContainer: {
+        // width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         borderRadius: 3,
         borderWidth: 1,
         borderStyle: 'solid',
-        borderColor: '#666666',
-        paddingHorizontal: 10,
+        borderColor: '#66666688',
+        paddingHorizontal: 13,
+        paddingVertical: 3,
+        backgroundColor: '#d7e9ff33'
+    },
+
+    input: {
+        flex: 1,
     },
 
     errorText: {

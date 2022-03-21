@@ -36,18 +36,21 @@ const LibraryArticlesScreen: React.FC<ScreenProps<'LibraryArticles'>> = (props) 
 
         navigation.setOptions({
             title: subject.title,
-
-            //TODO show only for teacher
-            headerRight: () => (
-                <View style={headerStyles.iconsContainer}>
-                    <TouchableOpacity
-                        onPress={() => navigation.navigate('ArticleForm', {year, specialityId, subjectId: subject.id})}
-                    >
-                        <Ionicons name={'add'} color={'#0976FF'} size={30} style={headerStyles.icon}/>
-                    </TouchableOpacity>
-                </View>
-            )
         })
+
+        if (profile?.groupName === 'teacher' && profile.subjects.includes(subject.id)) {
+            navigation.setOptions({
+                headerRight: () => (
+                    <View style={headerStyles.iconsContainer}>
+                        <TouchableOpacity
+                            onPress={() => navigation.navigate('ArticleForm', {year, specialityId, subjectId: subject.id})}
+                        >
+                            <Ionicons name={'add'} color={'#0976FF'} size={30} style={headerStyles.icon}/>
+                        </TouchableOpacity>
+                    </View>
+                )
+            })
+        }
     }, [subject, year, specialityId, profile])
 
     const onTeacherSelect = (teacherEmail: string) => {

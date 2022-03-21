@@ -19,7 +19,6 @@ type Props = {
 const File: React.FC<Props> = (props) => {
     const name = props.name || getFileName(props.uri)
     const isImage = isFileTypeImage(getFileType(name))
-
     const newFileName = useMemo(() => name.length < 30 ? name : name.slice(0, 10) + '...' + name.slice(-10), [name])
 
     const navigator = useNavigation<NavigationProps>()

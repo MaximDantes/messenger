@@ -18,6 +18,9 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
     const dispatch = useDispatch()
     const navigation = useNavigation<NavigationProps>()
 
+    const isFetching = useSelector(selectProfileFetching)
+    const profile = useSelector(selectProfile)
+
     const showLogoutModal = () => {
         if (Platform.OS === 'web') {
             dispatch(logout())
@@ -49,8 +52,14 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
         })
     }, [])
 
-    const isFetching = useSelector(selectProfileFetching)
-    const profile = useSelector(selectProfile)
+    useEffect(() => {
+        if (profile?.newAccount) {
+            Alert.alert('Изменение пароля', 'Ваш аккаунт использует автоматически генерированный пароль', [
+                {text: 'Изменить', onPress: () => navigation.navigate('ChangePassword', {recoveryMode: false})},
+                {text: 'Позже'},
+            ])
+        }
+    }, [profile])
 
     const [editMode, setEditMode] = useState(false)
     const [file, setFile] = useState<DocumentResult | null>(null)
@@ -75,6 +84,7 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
                 <ProfileForm
                     firstName={profile?.firstName || ''}
                     lastName={profile?.lastName || ''}
+                    email={profile?.email || ''}
                     phoneNumber={profile?.phoneNumber || ''}
                     phonePublicity={profile?.phonePublicity || true}
                     editMode={editMode}

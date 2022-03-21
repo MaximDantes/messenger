@@ -4,7 +4,7 @@ import {Button, Dimensions, ScrollView, StyleSheet, View} from 'react-native'
 import {screenStyles} from '../styles/common'
 import {useDispatch} from 'react-redux'
 import {useNavigation} from '@react-navigation/native'
-import {createArticle} from '../store/articles/articles-thunks'
+import {createArticle, editArticle} from '../store/articles/articles-thunks'
 import {IFile} from '../types/entities'
 import * as DocumentPicker from 'expo-document-picker'
 import * as Yup from 'yup'
@@ -56,7 +56,7 @@ const ArticleFormScreen: React.FC<ScreenProps<'ArticleForm'>> = (props) => {
         }
     }
 
-    const create = (values: {title: string, text: string}) => {
+    const create = (values: { title: string, text: string }) => {
         if (subjectId && year && specialityId) {
             dispatch(createArticle(values.title, values.text, subjectId, year, specialityId, files))
 
@@ -64,9 +64,16 @@ const ArticleFormScreen: React.FC<ScreenProps<'ArticleForm'>> = (props) => {
         }
     }
 
-    const edit = (values: {title: string, text: string}) => {
+    const edit = (values: { title: string, text: string }) => {
         //TODO edit
-        navigation.goBack()
+        if (editedArticle) {
+            dispatch(editArticle(editedArticle.id, values.title, values.text, files))
+            navigation.goBack()
+        }
+    }
+
+    const removeFile = (file: IFile) => {
+        setFiles(files.filter(item => item !== file))
     }
 
     return <View style={screenStyles.container}>
@@ -80,28 +87,30 @@ const ArticleFormScreen: React.FC<ScreenProps<'ArticleForm'>> = (props) => {
         >
             {(formik) => <View style={styles.innerContainer}>
                 <ScrollView>
-                    <FormikField
-                        value={formik.values.title}
-                        onChangeText={formik.handleChange('title')}
-                        placeholder={'Название'}
-                        error={formik.touched.title ? formik.errors.title : undefined}
-                        style={styles.input}
-                    />
-                    <FormikField
-                        value={formik.values.text}
-                        onChangeText={formik.handleChange('text')}
-                        placeholder={'Текст'}
-                        error={formik.touched.text ? formik.errors.text : undefined}
-                        multiline={true}
-                        numberOfLines={10}
-                        style={[styles.input, styles.textarea]}
-                    />
+                    <View style={styles.inputContainer}>
+                        <FormikField
+                            value={formik.values.title}
+                            onChangeText={formik.handleChange('title')}
+                            placeholder={'Название'}
+                            error={formik.touched.title ? formik.errors.title : undefined}
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <FormikField
+                            value={formik.values.text}
+                            onChangeText={formik.handleChange('text')}
+                            placeholder={'Текст'}
+                            error={formik.touched.text ? formik.errors.text : undefined}
+                            multiline={true}
+                            numberOfLines={10}
+                            style={styles.textarea}
+                        />
+                    </View>
 
                     <View style={styles.filesContainer}>
                         <Files
                             files={files}
-                            downloadingDisabled={true}
-                            showingDisabled={true}
+                            onDelete={removeFile}
                         />
                     </View>
                 </ScrollView>
@@ -129,7 +138,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
     },
 
-    input: {
+    inputContainer: {
         marginVertical: 5,
     },
 

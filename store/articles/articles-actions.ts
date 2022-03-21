@@ -21,6 +21,11 @@ export const articleCreated = (articlePreview: IArticlePreview) => ({
     payload: articlePreview
 } as const)
 
+export const articleEdited = (article: IArticle) => ({
+    type: 'articles/ARTICLE_EDITED',
+    payload: article
+} as const)
+
 export const shareArticle = (sharedArticle: IArticlePreview) => ({
     type: 'articles/SHARED_ARTICLE_CHANGED',
     payload: sharedArticle
@@ -29,6 +34,10 @@ export const shareArticle = (sharedArticle: IArticlePreview) => ({
 export const removeArticleFromSharing = (id: number) => ({
     type: 'articles/ARTICLE_REMOVED_FROM_SHARING',
     payload: id
+} as const)
+
+export const clearSharing = () => ({
+    type: 'articles/CLEAR_SHARING'
 } as const)
 
 export const fetchingStateChanged = (isFetching: boolean) => ({

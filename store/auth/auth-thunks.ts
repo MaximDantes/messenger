@@ -21,8 +21,6 @@ export const auth = (email: string, password: string): Thunk => async (dispatch)
         dispatch(errorStateChanged(false))
 
     } catch (e) {
-        // await handleTokenExpired(e, () => dispatch(auth(email, password)))
-
         console.error('auth', e)
         dispatch(errorStateChanged(true))
     }
@@ -39,6 +37,7 @@ export const logout = (): Thunk => async (dispatch) => {
         }
     } catch (e) {
         console.error('logout', e)
+        await handleTokenExpired(e, () => dispatch(logout()))
     } finally {
         dispatch(fetchingStateChanged(false))
     }
@@ -46,7 +45,6 @@ export const logout = (): Thunk => async (dispatch) => {
 
 export const refreshToken = (rejectedThunk?: Function): Thunk => async (dispatch) => {
     try {
-        console.log(rejectedThunk)
         dispatch(fetchingStateChanged(true))
 
         const response = await authApi.refreshToken()
@@ -75,6 +73,7 @@ export const checkAuth = (): Thunk => async (dispatch) => {
         dispatch(startMessagesListening())
     } catch (e) {
         console.error('check auth', e)
+        await handleTokenExpired(e, () => dispatch(checkAuth()))
     } finally {
         dispatch(fetchingStateChanged(false))
     }

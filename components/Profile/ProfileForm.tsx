@@ -9,10 +9,14 @@ import {IProfileInfo} from '../../types/entities'
 import * as Yup from 'yup'
 import FormikField from '../common/FormikField'
 import CheckBox from '../common/CheckBox'
+import regex from '../../utilits/regex'
+import Card from '../common/Card'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 type Props = {
     firstName: string
     lastName: string
+    email: string
     phoneNumber: string
     phonePublicity: boolean
     editMode: boolean
@@ -28,7 +32,7 @@ const validationSchema = Yup.object().shape({
         .max(50, 'Слишком длинное')
         .required('Поле обязательно для заполнения'),
     phoneNumber: Yup.string()
-        .matches(/\+\d{9}/, 'Неверный формат телефона')
+        .matches(regex.phone, 'Неверный формат телефона')
         .required('Поле обязательно для заполнения')
 })
 
@@ -43,10 +47,15 @@ const ProfileForm: React.FC<Props> = (props) => {
     }, [props.phonePublicity])
 
     const onSubmit = (values: Omit<IProfileInfo, 'phonePublicity'>) => {
-        dispatch(editProfile({...values, phonePublicity: isChecked}))
+        dispatch(editProfile({...values, phonePublicity: !isChecked}))
 
         props.saveAvatar()
         props.disableEditMode()
+    }
+
+    const changeEmail = () => {
+        props.disableEditMode()
+        navigation.navigate('ChangeEmail')
     }
 
     return <View style={styles.container}>
@@ -63,44 +72,74 @@ const ProfileForm: React.FC<Props> = (props) => {
                 >
                     {(formik) => (
                         <View>
-                            <FormikField
-                                value={formik.values.firstName}
-                                onChangeText={formik.handleChange('firstName')}
-                                placeholder={'Имя'}
-                                error={formik.errors.firstName}
-                                style={styles.input}
-                            />
-                            <FormikField
-                                value={formik.values.lastName}
-                                onChangeText={formik.handleChange('lastName')}
-                                placeholder={'Имя'}
-                                error={formik.errors.lastName}
-                                style={styles.input}
-                            />
-                            <FormikField
-                                value={formik.values.phoneNumber}
-                                onChangeText={formik.handleChange('phoneNumber')}
-                                placeholder={'Телефон'}
-                                error={formik.errors.phoneNumber}
-                                style={styles.input}
-                                keyboardType={'phone-pad'}
-                            />
+                            <View style={styles.inputContainer}>
+                                <FormikField
+                                    value={formik.values.firstName}
+                                    onChangeText={formik.handleChange('firstName')}
+                                    placeholder={'Имя'}
+                                    error={formik.errors.firstName}
+                                    style={styles.input}
+                                />
+                            </View>
+                            <View style={styles.inputContainer}>
+                                <FormikField
+                                    value={formik.values.lastName}
+                                    onChangeText={formik.handleChange('lastName')}
+                                    placeholder={'Имя'}
+                                    error={formik.errors.lastName}
+                                    style={styles.input}
+                                />
+                            </View>
+                            <View style={styles.inputContainer}>
+                                <FormikField
+                                    value={formik.values.phoneNumber}
+                                    onChangeText={formik.handleChange('phoneNumber')}
+                                    placeholder={'Телефон'}
+                                    error={formik.errors.phoneNumber}
+                                    style={styles.input}
+                                    keyboardType={'phone-pad'}
+                                />
+                            </View>
                             <CheckBox
                                 checked={isChecked}
                                 onPress={setIsChecked}
-                                text={'phone publicity'}
+                                text={'Скрывать контактные данные'}
+                                style={styles.input}
                             />
 
-                            <Button title={'Изменить пароль'}
-                                    onPress={() => navigation.navigate('ChangePassword', {recoveryMode: false})}/>
+                            <View style={styles.buttonsContainer}>
+                                <View style={styles.inputContainer}>
+                                    <Card
+                                        style={styles.card}
+                                        onPress={changeEmail}
+                                    >
+                                        <Ionicons name={'mail-outline'} size={22} color={'#00000066'}/>
+                                        <Text style={styles.text}>Логин</Text>
+                                    </Card>
+                                </View>
+
+                                <View style={styles.inputContainer}>
+                                    <Card
+                                        style={styles.card}
+                                        onPress={() => navigation.navigate('ChangePassword', {recoveryMode: false})}
+                                    >
+                                        <Ionicons name={'key-outline'} size={22} color={'#00000066'}/>
+                                        <Text style={styles.text}>Пароль</Text>
+                                    </Card>
+                                </View>
+                            </View>
 
                             <View style={styles.buttonsContainer}>
-                                <Button
-                                    title={'Сохранить'}
-                                    onPress={formik.submitForm}
-                                    disabled={formik.isSubmitting}
-                                />
-                                <Button title={'Отмена'} onPress={props.disableEditMode}/>
+                                <View style={styles.buttonContainer}>
+                                    <Button
+                                        title={'Сохранить'}
+                                        onPress={formik.submitForm}
+                                        disabled={formik.isSubmitting}
+                                    />
+                                </View>
+                                <View style={styles.buttonContainer}>
+                                    <Button title={'Отмена'} onPress={props.disableEditMode}/>
+                                </View>
                             </View>
                         </View>
                     )}
@@ -110,6 +149,7 @@ const ProfileForm: React.FC<Props> = (props) => {
             <>
                 <Text style={styles.text}>{props.firstName}</Text>
                 <Text style={styles.text}>{props.lastName}</Text>
+                <Text style={styles.text}>{props.email}</Text>
                 <Text style={styles.text}>{props.phoneNumber}</Text>
             </>
         }
@@ -122,18 +162,34 @@ const styles = StyleSheet.create({
     },
 
     text: {
-        fontSize: 16,
+        fontSize: 18,
         fontWeight: '500',
-        marginVertical: 5,
+        paddingVertical: 5,
+        paddingHorizontal: 10,
     },
 
     input: {
+        fontSize: 18,
         marginVertical: 5,
+    },
+
+    inputContainer: {
+        paddingVertical: 5,
     },
 
     checkBox: {
         borderColor: '#f00',
         backgroundColor: '#f00',
+    },
+
+    buttonContainer: {
+        width: 120,
+    },
+
+    card: {
+        width: 150,
+        flexDirection: 'row',
+        alignItems: 'center',
     },
 
     buttonsContainer: {

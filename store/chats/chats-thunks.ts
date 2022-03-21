@@ -25,6 +25,7 @@ export const getChatMembers = (chatId: number): Thunk => async (dispatch) => {
         }
     } catch (e) {
         console.error('get chat members', e)
+        await handleTokenExpired(e, () => dispatch(getChatMembers(chatId)))
     }
 }
 

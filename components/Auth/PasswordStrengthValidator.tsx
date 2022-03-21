@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {StyleSheet, Text, View} from 'react-native'
+import regex from '../../utilits/regex'
 
 type Props = {
     password: string
@@ -10,14 +11,11 @@ const PasswordStrengthValidator: React.FC<Props> = (props) => {
     const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>('week')
 
     useEffect(() => {
-        const secureRegex = new RegExp('^(?=.{14,})(?=.*[A-Z,А-ЯЁ])(?=.*[a-z,а-яё])(?=.*[0-9])(?=.*\\W).*$', 'g')
-        const mediumRegex = new RegExp('^(?=.{10,})(((?=.*[A-Z,А-ЯЁ])(?=.*[a-z,а-яё]))|((?=.*[A-Z,А-ЯЁ])(?=.*[0-9]))|((?=.*[a-z,а-яё])(?=.*[0-9]))).*$', 'g')
-
-        if (secureRegex.test(props.password)) {
+        if (regex.securePassword.test(props.password)) {
             setPasswordStrength('secure')
             props.setPasswordStrength?.('secure')
             return
-        } else if (mediumRegex.test(props.password)) {
+        } else if (regex.mediumPassword.test(props.password)) {
             setPasswordStrength('medium')
             props.setPasswordStrength?.('medium')
             return

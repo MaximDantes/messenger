@@ -19,12 +19,12 @@ import ImagesScreen from './screens/ImagesScreen'
 import AttachmentsScreen from './screens/AttachmentsScreen'
 import ArticleScreen from './screens/ArticleScreen'
 import {StackNavigatorParamList, TabNavigatorParamList} from './types/screens'
-import LibraryYearsScreen from './screens/LibraryYearsScreen'
 import MembersScreen from './screens/MembersScreen'
 import ChangePasswordScreen from './screens/ChangePasswordScreen'
-import LibrarySubjectsScreen from './screens/LibrarySubjectsScreen'
-import LibraryArticlesScreen from './screens/LibraryArticlesScreen'
 import ArticleFormScreen from './screens/ArticleFormScreen'
+import ChangeEmailScreen from './screens/ChangeEmailScreen'
+import VerificationScreen from './screens/VerificationScreen'
+import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
 
 const Tab = createBottomTabNavigator<TabNavigatorParamList>()
 const Stack = createNativeStackNavigator<StackNavigatorParamList>()
@@ -32,7 +32,6 @@ const Stack = createNativeStackNavigator<StackNavigatorParamList>()
 const MainNavigation: React.FC = () => {
     return <Tab.Navigator
         screenOptions={({route}) => ({
-            //TODO remove animation
             tabBarHideOnKeyboard: true,
 
             tabBarIcon: ({focused, color, size}) => {
@@ -73,7 +72,6 @@ const Main: React.FC = () => {
 
             :
 
-            //TODO remove header padding
             <Stack.Navigator
                 screenOptions={{
                     gestureEnabled: true,
@@ -94,11 +92,23 @@ const Main: React.FC = () => {
                         <Stack.Screen name={'Members'} component={MembersScreen}/>
                         <Stack.Screen options={{title: 'Изменение пароля'}} name={'ChangePassword'}
                                       component={ChangePasswordScreen}/>
+                        <Stack.Screen options={{title: 'Изменение email'}} name={'ChangeEmail'}
+                                      component={ChangeEmailScreen}/>
+                        <Stack.Screen options={{title: 'Подтверждение email'}} name={'Verification'}
+                                      component={VerificationScreen}/>
                     </>
 
                     :
 
-                    <Stack.Screen name={'Auth'} component={AuthScreen} options={{headerShown: false}}/>
+                    <>
+                        <Stack.Screen name={'Auth'} component={AuthScreen} options={{headerShown: false}}/>
+                        <Stack.Screen options={{title: 'Восстановление пароля'}} name={'ForgotPassword'}
+                                      component={ForgotPasswordScreen}/>
+                        <Stack.Screen options={{title: 'Восстановление пароля'}} name={'Verification'}
+                                      component={VerificationScreen}/>
+                        <Stack.Screen options={{title: 'Восстановление пароля'}} name={'ChangePassword'}
+                                      component={ChangePasswordScreen}/>
+                    </>
                 }
             </Stack.Navigator>
 

@@ -27,8 +27,22 @@ const messagesReducer = (state = initialState, action: Action): typeof initialSt
         case 'messages/MESSAGE_DELETED':
             return {
                 ...state,
-                messages: state.messages.filter(item => item.id !== action.payload)
+                messages: state.messages
+                    .filter(item => item.id !== action.payload.id || item.chatId !== action.payload.chatId)
             }
+
+        case 'messages/MESSAGE_EDITED':
+            const oldMessage = state.messages
+                .find(item => item.id === action.payload.id && item.chatId === action.payload.chatId)
+
+            if (oldMessage) {
+                return {
+                    ...state,
+                    messages: formatMessages([action.payload, ...state.messages])
+                }
+            }
+
+            return state
 
         case 'messages/MESSAGES_RECEIVED':
             return {
@@ -41,6 +55,22 @@ const messagesReducer = (state = initialState, action: Action): typeof initialSt
                 ...state,
                 isFetching: action.payload
             }
+
+        case 'messages/MESSAGES_SENDING_STATE_CHANGED':
+            const message = state.messages
+                .find(item => item.id === action.payload.messageId && item.chatId === action.payload.chatId)
+            //TODO sdelat suka blyat
+            if (message) {
+                return {
+                    ...state,
+                    messages: formatMessages([...state.messages, {
+                        ...message,
+                        inSending: action.payload.isSending
+                    }])
+                }
+            }
+
+            return state
 
         case 'messages/MESSAGE_SENT':
             return {

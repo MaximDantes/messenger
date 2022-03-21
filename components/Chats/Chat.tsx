@@ -1,8 +1,6 @@
-import {Image, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native'
+import {Image, StyleSheet, Text, View} from 'react-native'
 import React from 'react'
 import {IChat} from '../../types/entities'
-import {useSelector} from 'react-redux'
-import {selectProfile} from '../../store/profile/profile-selectors'
 import {getPrintTimeFormat} from '../../utilits/format-date'
 import Card from '../common/Card'
 

@@ -1,23 +1,42 @@
 import React, {useState} from 'react'
 import {Alert, Button, StyleSheet, Text, View} from 'react-native'
-import {screenStyles} from '../styles/common'
-import {ScreenProps} from '../types/screens'
+import {changeScreenStyles, screenStyles} from '../styles/common'
+import {NavigationProps, ScreenProps} from '../types/screens'
 import PasswordStrengthValidator, {PasswordStrength} from '../components/Auth/PasswordStrengthValidator'
-import PasswordInput from '../components/common/PasswordInput'
-import {useDispatch} from 'react-redux'
-import {changePassword} from '../store/profile/profile-thunks'
+import {useDispatch, useSelector} from 'react-redux'
+import {changePassword, setPassword} from '../store/profile/profile-thunks'
+import FormikField from '../components/common/FormikField'
+import {selectProfileErrors} from '../store/profile/profile-selectors'
+import {errorAppeared} from '../store/profile/profile-actions'
+import {useNavigation} from '@react-navigation/native'
 
 const ChangePasswordScreen: React.FC<ScreenProps<'ChangePassword'>> = (props) => {
-    const dispatch = useDispatch()
+    const recoveryMode = props.route.params.recoveryMode
 
+    const dispatch = useDispatch()
+    const navigation = useNavigation<NavigationProps>()
+
+    const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>('week')
     const [oldPassword, setOldPassword] = useState('')
     const [newPassword, setNewPassword] = useState('')
     const [repeatedPassword, setRepeatedPassword] = useState('')
-    const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>('week')
     const [error, setError] = useState('')
 
-    const change = () => {
-        if (oldPassword && newPassword) {
+    const profileErrors = useSelector(selectProfileErrors)
+
+    const change = (newPassword: string, oldPassword: string) => {
+        if (!recoveryMode && oldPassword) {
+            dispatch(changePassword(oldPassword, newPassword))
+            navigation.navigate('Profile')
+        }
+        if (recoveryMode) {
+            dispatch(setPassword(newPassword))
+            navigation.navigate('Profile')
+        }
+    }
+
+    const onSubmit = () => {
+        if (newPassword && newPassword) {
             if (newPassword !== repeatedPassword) {
                 setError('Пароли не совпадают')
                 return
@@ -25,38 +44,74 @@ const ChangePasswordScreen: React.FC<ScreenProps<'ChangePassword'>> = (props) =>
 
             if (passwordStrength === 'week') {
                 Alert.alert('Новый пароль слишком слабый', 'Использовать этот пароль?', [
-                    {text: 'OK', onPress: () => dispatch(changePassword(oldPassword, newPassword))},
+                    {text: 'OK', onPress: () => change(oldPassword, newPassword)},
                     {text: 'Отмена'},
                 ])
             } else {
-                dispatch(changePassword(oldPassword, newPassword))
+                change(oldPassword, newPassword)
             }
         }
     }
 
-    return <View style={[screenStyles.container, styles.container]}>
-        <View style={styles.itemContainer}>
-            <PasswordInput placeholder={'Старый пароль'} value={oldPassword} onChangeText={setOldPassword}/>
+    const removeProfileError = () => {
+        if (profileErrors.password) {
+            dispatch(errorAppeared('', 'password'))
+        }
+    }
+
+    const removeError = () => {
+        if (error) {
+            setError('')
+        }
+    }
+
+    return <View style={[screenStyles.container, changeScreenStyles.container]}>
+        {!recoveryMode &&
+            <View style={[changeScreenStyles.inputContainer, styles.itemContainer]}>
+                <FormikField
+                    placeholder={'Старый пароль'}
+                    value={oldPassword}
+                    onChangeText={(text) => {
+                        setOldPassword(text)
+                        removeProfileError()
+                    }}
+                    password={true}
+                    error={profileErrors.password}
+                />
+            </View>
+        }
+
+        <View style={[changeScreenStyles.inputContainer, styles.itemContainer]}>
+            <FormikField
+                placeholder={'Новый пароль'}
+                value={newPassword}
+                onChangeText={(text => {
+                    setNewPassword(text)
+                    removeError()
+                })}
+                password={true}
+            />
         </View>
 
-        <View style={styles.itemContainer}>
-            <PasswordInput placeholder={'Новый пароль'} value={newPassword} onChangeText={setNewPassword}/>
+        <View style={[changeScreenStyles.inputContainer, styles.itemContainer]}>
+            <FormikField
+                placeholder={'Повторите пароль'}
+                value={repeatedPassword}
+                onChangeText={(text => {
+                    setRepeatedPassword(text)
+                    removeError()
+                })}
+                password={true}
+                error={error}
+            />
         </View>
-
-        <View style={styles.itemContainer}>
-            <PasswordInput placeholder={'Повторите пароль'} value={repeatedPassword} onChangeText={setRepeatedPassword}/>
-        </View>
-
-        {!!error && <View style={styles.itemContainer}>
-            <Text style={styles.error}>{error}</Text>
-        </View>}
 
         <View style={styles.itemContainer}>
             <PasswordStrengthValidator password={newPassword} setPasswordStrength={setPasswordStrength}/>
         </View>
 
-        <View style={[styles.itemContainer, styles.buttonContainer]}>
-            <Button title={'OK'} onPress={change}/>
+        <View style={styles.buttonContainer}>
+            <Button title={'OK'} onPress={onSubmit}/>
         </View>
     </View>
 }
@@ -68,19 +123,13 @@ const styles = StyleSheet.create({
     },
 
     itemContainer: {
-        width: '100%',
-        alignItems: 'center',
-        paddingVertical: 10,
-        paddingHorizontal: 40,
+        paddingVertical: 5,
     },
 
     buttonContainer: {
-        maxWidth: 200,
+        minWidth: 120,
+        paddingVertical: 10,
     },
-
-    error: {
-        color: '#f00'
-    }
 })
 
 export default ChangePasswordScreen

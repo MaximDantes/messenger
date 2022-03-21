@@ -3,15 +3,15 @@ import {IProfile, IProfileInfo} from '../types/entities'
 import {snakeToCamel} from '../utilits/case-convert'
 import {DocumentResult} from 'expo-document-picker'
 import {Platform} from 'react-native'
+import {ErrorMessages} from '../store/exceptions'
 
 const profileApi = {
     get: async () => {
         const response = await axiosInstance.get<IProfile>('users/me')
 
+        //TODO remove mock
         return {
-            data: {
-                ...snakeToCamel<IProfile>(response.data),
-            } as IProfile,
+            data: snakeToCamel<IProfile>({...response.data, newAccount: false, subjects: [1]}),
             status: response.status
         }
     },
@@ -46,9 +46,7 @@ const profileApi = {
             }
         }
 
-        const response = await axiosInstance.post<{ avatar: string }>('users/me/avatar/', formData)
-
-        return response
+        return await axiosInstance.post<{ avatar: string }>('users/me/avatar/', formData)
     },
 
     changePassword: async (oldPassword: string, newPassword: string) => {
@@ -57,8 +55,39 @@ const profileApi = {
             new_password: newPassword
         })
 
-        return response
-    }
+        if (!response) throw Error(ErrorMessages.wrongOldPassword)
+    },
+
+    setNewPassword: async (password: string) => {
+        await axiosInstance.patch('users/me/password/', {
+            old_password: 'some password',
+            new_password: password
+        })
+    },
+
+    changeEmail: async (email: string) => {
+        const response = await axiosInstance.post('users/me/email/', {email})
+
+        if (!response) throw Error(ErrorMessages.loginIsAlreadyExists)
+    },
+
+    sendEmailCode: async (code: string) => {
+        const response = await axiosInstance.post<{ email: string }>('users/me/email/verification/', {code})
+
+        if (!response) throw Error(ErrorMessages.invalidCode)
+    },
+
+    restorePassword: async (email: string) => {
+        const response = await axiosInstance.post('users/password/', {email})
+
+        if (!response) throw Error(ErrorMessages.noAccountWithThisEmail)
+    },
+
+    sendPasswordCode: async (code: string, email: string) => {
+        const response = await axiosInstance.post<{ email: string }>('users/password/verification/', {email, code})
+
+        if (!response) throw Error(ErrorMessages.invalidCode)
+    },
 }
 
 export default profileApi

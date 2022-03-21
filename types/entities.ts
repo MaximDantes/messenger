@@ -31,6 +31,7 @@ export interface IMessage {
     readonly chatId: number
     readonly date: Date
     readonly files: IFile[]
+    readonly articles: IArticlePreview[]
     readonly user: {
         id: number
         firstName: string
@@ -52,6 +53,8 @@ export interface IProfile {
     readonly year: number
     readonly phoneNumber: string
     readonly groupName: GroupName
+    readonly newAccount: boolean
+    readonly subjects: number[]
 }
 
 export interface IProfileInfo {
@@ -64,7 +67,7 @@ export interface IProfileInfo {
 export interface IUser {
     readonly id: number
     readonly email: string
-    readonly phone: string
+    readonly phoneNumber: string
     readonly firstName: string
     readonly lastName: string
     readonly avatar: string
