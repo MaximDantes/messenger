@@ -1,6 +1,6 @@
 import {Thunk} from './articles-reducer'
 import {
-    articleCreated,
+    articleCreated, articleEdited,
     articleReceived,
     articleRemoved,
     articlesPreviewsReceived,
@@ -10,7 +10,8 @@ import articlesApi from '../../api/articles-api'
 import {statusCodes} from '../../types/status-codes'
 import {IFile} from '../../types/entities'
 import handleTokenExpired from '../handle-token-expired'
-import messagesApi from '../../api/messages-api'
+import {messageArticleEdited} from '../messages/messages-actions'
+import {editMessagesArticle} from '../messages/messages-thunks'
 
 export const getArticlesPreviews = (specialityId: number, year: number, subjectId: number, teacher?: string): Thunk =>
     async (dispatch) => {
@@ -67,7 +68,6 @@ export const createArticle = (title: string, text: string, subjectId: number,
 
         const response = await articlesApi.create(title, text, subjectId, year, specialityId)
 
-        //TODO load all files
         const sendFiles = async () => {
             files.forEach(item => {
                 articlesApi.addFile(response.data.id, item)
@@ -89,19 +89,28 @@ export const editArticle = (articleId: number, title: string, text: string, file
     try {
         dispatch(fetchingStateChanged(true))
 
-        // const sendFiles = async () => {
-        //     files.forEach(item => {
-        //         if (!item.id) {
-        //             articlesApi.addFile(response.data.id, item)
-        //         } else {}
-        //     })
-        // }
-        //
-        // await sendFiles()
+        const getFilesId = async () => {
+            const requests: Promise<number>[] = []
 
-        await articlesApi.edit(articleId, title, text)
+            files.map(item => {
+                if (!item.id) {
+                    requests.push(articlesApi.addFile(articleId, item).then(response => Number(response.data.id)))
+                } else {
+                    requests.push(new Promise((resolve) => resolve(Number(item.id))))
+                }
+            })
+
+            return await Promise.all<number>(requests)
+        }
+
+        const filesId = await getFilesId()
+
+        const response = await articlesApi.edit(articleId, title, text, filesId)
+
+        dispatch(articleEdited(response.data))
+        dispatch(editMessagesArticle({id: response.data.id, title: response.data.title}))
     } catch (e) {
-        console.error('edit article, e')
+        console.error('edit article', e)
         await handleTokenExpired(e, () => dispatch(editArticle(articleId, title, text, files)))
     } finally {
         dispatch(fetchingStateChanged(false))

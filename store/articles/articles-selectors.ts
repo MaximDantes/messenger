@@ -1,6 +1,6 @@
 import {State} from '../store'
 
-export const selectArticlesPreviews = (state: State) => state.articles.articlesPreviews
+export const selectArticlesPreviews = (state: State) => [...state.articles.articlesPreviews].reverse()
 
 export const selectArticle = (articleId: number) => (state: State) => state.articles.articles
     .find(item => item.id === articleId)

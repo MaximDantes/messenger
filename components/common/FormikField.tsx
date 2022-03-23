@@ -21,6 +21,7 @@ type Props = {
     numberOfLines?: number
     onChangeText(text: string): void
     password?: boolean
+    disableCapitalize?: boolean
 }
 
 const FormikField: React.FC<Props> = ({error, style, ...props}) => {
@@ -32,6 +33,7 @@ const FormikField: React.FC<Props> = ({error, style, ...props}) => {
                 secureTextEntry={!isPasswordVisible}
                 {...props}
                 style={[styles.input, style]}
+                autoCapitalize={props.disableCapitalize ? 'none' : props.password ? 'none' : undefined}
             />
 
             {props.password &&

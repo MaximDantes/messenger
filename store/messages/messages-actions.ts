@@ -1,4 +1,4 @@
-import {IMessage} from '../../types/entities'
+import {IArticlePreview, IMessage} from '../../types/entities'
 import message from '../../components/Messages/Message'
 
 export const messagesReceived = (messages: IMessage[]) => ({
@@ -29,6 +29,16 @@ export const messageSent = (message: IMessage) => ({
 export const messageSendingStateChanged = (messageId: number, chatId: number, isSending: boolean) => ({
     type: 'messages/MESSAGES_SENDING_STATE_CHANGED',
     payload: {messageId, chatId, isSending}
+} as const)
+
+export const sendingErrorAppeared = (messageId: number, chatId: number) => ({
+    type: 'messages/SENDING_ERROR_APPEARED',
+    payload: {messageId, chatId}
+} as const)
+
+export const messageArticleEdited = (article: IArticlePreview) => ({
+    type: 'messages/ARTICLE_EDITED',
+    payload: article
 } as const)
 
 export const fetchingChanged = (value: boolean) => ({

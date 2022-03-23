@@ -57,20 +57,27 @@ const messagesReducer = (state = initialState, action: Action): typeof initialSt
             }
 
         case 'messages/MESSAGES_SENDING_STATE_CHANGED':
-            const message = state.messages
-                .find(item => item.id === action.payload.messageId && item.chatId === action.payload.chatId)
-            //TODO sdelat suka blyat
-            if (message) {
-                return {
-                    ...state,
-                    messages: formatMessages([...state.messages, {
-                        ...message,
+            return {
+                ...state,
+                messages: state.messages.map(item => {
+                    return item.id === action.payload.messageId && item.chatId === action.payload.chatId ? {
+                        ...item,
                         inSending: action.payload.isSending
-                    }])
-                }
+                    } : item
+                })
             }
 
-            return state
+        case 'messages/SENDING_ERROR_APPEARED':
+            return {
+                ...state,
+                messages: state.messages.map(item => {
+                    return item.id === action.payload.messageId && item.chatId === action.payload.chatId ? {
+                        ...item,
+                        inSending: false,
+                        isError: true
+                    } : item
+                })
+            }
 
         case 'messages/MESSAGE_SENT':
             return {
@@ -78,6 +85,16 @@ const messagesReducer = (state = initialState, action: Action): typeof initialSt
                 messages: [...state.messages, action.payload],
                 clientSideId: state.clientSideId - 1
             }
+
+        case 'messages/ARTICLE_EDITED': {
+            return {
+                ...state,
+                messages: state.messages.map(item => item.articles.find(article => article.id === action.payload.id) ? {
+                    ...item,
+                    articles: item.articles.map(article => article.id === action.payload.id ? action.payload : article)
+                } : item)
+            }
+        }
 
         default:
             return state

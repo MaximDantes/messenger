@@ -47,6 +47,7 @@ const AuthScreen: React.FC<ScreenProps<'Auth'>> = () => {
                                 onChangeText={formik.handleChange('email')}
                                 placeholder={'Логин'}
                                 error={formik.touched.email ? formik.errors.email : undefined}
+                                disableCapitalize={true}
                             />
                         </View>
                         <View style={styles.inputContainer}>
@@ -59,6 +60,12 @@ const AuthScreen: React.FC<ScreenProps<'Auth'>> = () => {
                                 password={true}
                             />
                         </View>
+
+                        {isError &&
+                            <View style={styles.inputContainer}>
+                                <Text style={[styles.text, styles.error]}>Неверно введен логин или пароль</Text>
+                            </View>
+                        }
 
                         <View style={styles.buttonContainer}>
                             <Button title={'Вход'} onPress={formik.submitForm}/>
@@ -106,6 +113,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#2195F2',
         fontSize: 16,
+    },
+
+    error: {
+        color: '#f00'
     }
 })
 

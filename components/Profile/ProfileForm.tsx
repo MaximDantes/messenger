@@ -42,8 +42,9 @@ const ProfileForm: React.FC<Props> = (props) => {
     const dispatch = useDispatch()
 
     const [isChecked, setIsChecked] = useState(false)
+
     useEffect(() => {
-        setIsChecked(props.phonePublicity)
+        setIsChecked(!props.phonePublicity)
     }, [props.phonePublicity])
 
     const onSubmit = (values: Omit<IProfileInfo, 'phonePublicity'>) => {
@@ -77,7 +78,7 @@ const ProfileForm: React.FC<Props> = (props) => {
                                     value={formik.values.firstName}
                                     onChangeText={formik.handleChange('firstName')}
                                     placeholder={'Имя'}
-                                    error={formik.errors.firstName}
+                                    error={formik.touched.firstName ? formik.errors.firstName : undefined}
                                     style={styles.input}
                                 />
                             </View>
@@ -86,7 +87,7 @@ const ProfileForm: React.FC<Props> = (props) => {
                                     value={formik.values.lastName}
                                     onChangeText={formik.handleChange('lastName')}
                                     placeholder={'Имя'}
-                                    error={formik.errors.lastName}
+                                    error={formik.touched.lastName ? formik.errors.lastName : undefined}
                                     style={styles.input}
                                 />
                             </View>
@@ -95,7 +96,7 @@ const ProfileForm: React.FC<Props> = (props) => {
                                     value={formik.values.phoneNumber}
                                     onChangeText={formik.handleChange('phoneNumber')}
                                     placeholder={'Телефон'}
-                                    error={formik.errors.phoneNumber}
+                                    error={formik.touched.phoneNumber ? formik.errors.phoneNumber : undefined}
                                     style={styles.input}
                                     keyboardType={'phone-pad'}
                                 />

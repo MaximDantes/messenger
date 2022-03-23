@@ -57,11 +57,9 @@ const articlesApi = {
         return await axiosInstance.delete(`wiki/article/${articleId}/files/${fileId}`)
     },
 
-    edit: async (articleId: number, title: string, text: string) => {
-        return  await axiosInstance.put<IArticle>('wiki/article/', {
-            id: articleId,
-            title,
-            text,
+    edit: async (articleId: number, title: string, text: string, files: number[]) => {
+        return  await axiosInstance.patch<IArticle>(`wiki/article/${articleId}`, {
+            title, text, files
         })
     }
 }

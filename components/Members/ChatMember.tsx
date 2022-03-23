@@ -26,7 +26,7 @@ const ChatMember: React.FC<Props> = (props) => {
 
         {showInfo && <View style={styles.infoContainer}>
             <Text style={styles.infoText}>{props.member.email}</Text>
-            <Text style={styles.infoText}>{props.member.phoneNumber}</Text>
+            {!!props.member.phoneNumber && <Text style={styles.infoText}>{props.member.phoneNumber}</Text>}
         </View>}
     </TouchableOpacity>
 }

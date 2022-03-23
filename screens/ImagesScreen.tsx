@@ -5,6 +5,7 @@ import Swiper from 'react-native-web-swiper'
 import {NavigationProps, ScreenProps} from '../types/screens'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import {downloadFile} from '../utilits/download-file'
+import {ReactNativeZoomableView} from '@dudigital/react-native-zoomable-view/dist'
 
 const ImagesScreen: React.FC<ScreenProps<'Images'>> = (props) => {
     const paramsImages = props.route.params.images
@@ -32,19 +33,26 @@ const ImagesScreen: React.FC<ScreenProps<'Images'>> = (props) => {
         setTitle(index)
     }
 
-    //TODO zoom
     return <View style={styles.container}>
-        <Swiper
-            controlsEnabled={false}
-            onIndexChanged={onIndexChange}
-            from={position}
+        <ReactNativeZoomableView
+            maxZoom={2}
+            minZoom={1}
+            zoomStep={0.5}
+            initialZoom={1}
+            bindToBorders={true}
         >
-            {paramsImages.map((item, index) => (
-                <View key={item + index}>
-                    <Image style={styles.image} source={{uri: item}}/>
-                </View>
-            ))}
-        </Swiper>
+            <Swiper
+                controlsEnabled={false}
+                onIndexChanged={onIndexChange}
+                from={position}
+            >
+                {paramsImages.map((item, index) => (
+                    <View key={item + index}>
+                        <Image style={styles.image} source={{uri: item}}/>
+                    </View>
+                ))}
+            </Swiper>
+        </ReactNativeZoomableView>
     </View>
 }
 

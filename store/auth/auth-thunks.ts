@@ -19,9 +19,8 @@ export const auth = (email: string, password: string): Thunk => async (dispatch)
         dispatch(startMessagesListening())
 
         dispatch(errorStateChanged(false))
-
     } catch (e) {
-        console.error('auth', e)
+        console.error('auth invalid credentials')
         dispatch(errorStateChanged(true))
     }
 }
@@ -43,17 +42,14 @@ export const logout = (): Thunk => async (dispatch) => {
     }
 }
 
-export const refreshToken = (rejectedThunk?: Function): Thunk => async (dispatch) => {
+export const refreshToken = (): Thunk => async (dispatch) => {
     try {
         dispatch(fetchingStateChanged(true))
 
         const response = await authApi.refreshToken()
 
-        if (response.status === statusCodes.success) {
-            rejectedThunk && dispatch(rejectedThunk())
-            dispatch(authorized(true))
-            dispatch(tokenReceived(response.data.access))
-        }
+        dispatch(authorized(true))
+        dispatch(tokenReceived(response.data.access))
     } catch (e) {
         console.error('refresh token', e)
     } finally {

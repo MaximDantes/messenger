@@ -9,9 +9,8 @@ const profileApi = {
     get: async () => {
         const response = await axiosInstance.get<IProfile>('users/me')
 
-        //TODO remove mock
         return {
-            data: snakeToCamel<IProfile>({...response.data, newAccount: false, subjects: [1]}),
+            data: snakeToCamel<IProfile>({...response.data}),
             status: response.status
         }
     },
@@ -58,10 +57,10 @@ const profileApi = {
         if (!response) throw Error(ErrorMessages.wrongOldPassword)
     },
 
-    setNewPassword: async (password: string) => {
-        await axiosInstance.patch('users/me/password/', {
-            old_password: 'some password',
-            new_password: password
+    setNewPassword: async (password: string, email: string) => {
+        await axiosInstance.post('users/password/verification/completion/', {
+            new_password: password,
+            email
         })
     },
 

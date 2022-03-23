@@ -7,6 +7,8 @@ import {IArticlePreview} from '../../types/entities'
 
 type Props = {
     articlePreview: IArticlePreview
+    increaseFont?: boolean
+    onLongPress?(): void
 }
 
 const ArticlePreview: React.FC<Props> = (props) => {
@@ -21,10 +23,13 @@ const ArticlePreview: React.FC<Props> = (props) => {
 
     return <TouchableOpacity
         onPress={onPress}
+        onLongPress={props.onLongPress}
         style={styles.container}
     >
         <FeatherIcon name={'file-text'} size={30} color={'#ffffff'}/>
-        <Text style={styles.text}>{newTitle}</Text>
+        <Text style={[styles.text, props.increaseFont && styles.increasedFont]}>
+            {newTitle}
+        </Text>
     </TouchableOpacity>
 }
 
@@ -41,8 +46,13 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         color: '#ffffff',
         marginHorizontal: 3,
-        marginVertical: 1,
+        marginVertical: 2,
         fontSize: 12,
+    },
+
+    increasedFont: {
+        marginVertical: 5,
+        fontSize: 16,
     },
 })
 

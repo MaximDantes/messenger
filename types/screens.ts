@@ -13,7 +13,7 @@ export type StackNavigatorParamList = {
     Article: { articlePreview: IArticlePreview },
     ArticleForm: { subjectId?: number, specialityId?: number, year?: number, editedArticle?: IArticle }
     Members: { chatId: number, chatName: string },
-    ChangePassword: { recoveryMode: boolean },
+    ChangePassword: { recoveryMode: boolean, email?: string },
     ChangeEmail: undefined
     Verification: { email: string, type: 'CHANGE_EMAIL' | 'RESTORE_PASSWORD' }
     ForgotPassword: { email: string }

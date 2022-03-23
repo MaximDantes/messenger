@@ -1,19 +1,8 @@
-import {
-    Button,
-    Image,
-    NativeScrollEvent,
-    NativeSyntheticEvent,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View
-} from 'react-native'
+import {Image, NativeScrollEvent, NativeSyntheticEvent, ScrollView, StyleSheet, Text, View} from 'react-native'
 import Message from './Message'
 import React, {useEffect, useRef} from 'react'
 import {getChatMessages, removeMessage} from '../../store/messages/messages-thunks'
 import {useDispatch, useSelector} from 'react-redux'
-import {State} from '../../store/store'
 import {selectChatMessages, selectMessagesFetching} from '../../store/messages/messages-selectors'
 import {selectProfile} from '../../store/profile/profile-selectors'
 import {IChat, IMessage} from '../../types/entities'
@@ -39,7 +28,6 @@ const MessagesContainer: React.FC<Props> = (props) => {
     }, [messages[messages.length - 1]])
 
     useEffect(() => {
-        //TODO set final messages count
         if (messages.length < 15) {
             dispatch(getChatMessages(props.chat.id))
         }
@@ -48,15 +36,24 @@ const MessagesContainer: React.FC<Props> = (props) => {
     const scrollView = useRef<ScrollView>(null)
 
     const scrollContentSize = useRef(0)
+    const isScrollOnBottom = useRef(false)
 
     const setScrollPosition = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
         scrollContentSize.current = e.nativeEvent.contentSize.height
+
+        isScrollOnBottom.current = (e.nativeEvent.layoutMeasurement.height + e.nativeEvent.contentOffset.y + 50 >
+            e.nativeEvent.contentSize.height)
     }
 
     const onContentSizeChange = (width: number, height: number) => {
         if (height - scrollContentSize.current > 100 || scrollContentSize.current - height > 100) {
             scrollView.current?.scrollTo({y: height - scrollContentSize.current, animated: false})
         }
+
+        if (isScrollOnBottom.current) {
+            scrollView.current?.scrollToEnd({animated: false})
+        }
+
         scrollContentSize.current = height
     }
 
@@ -114,12 +111,14 @@ const MessagesContainer: React.FC<Props> = (props) => {
                             <Text>{item.user.firstName + ' ' + item.user.lastName}</Text>
                         </View>
                     }
+
                     <Message
                         text={item.text}
                         time={item.date}
                         files={item.files}
                         articles={item.articles}
                         inSending={item.inSending || false}
+                        isError={item.isError || false}
                         sentByCurrentUser={item.user.id === profile?.id}
                         change={() => changeMessage(item)}
                     />

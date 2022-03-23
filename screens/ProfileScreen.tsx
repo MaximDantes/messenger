@@ -53,7 +53,7 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
     }, [])
 
     useEffect(() => {
-        if (profile?.newAccount) {
+        if (profile?.temporaryPassword) {
             Alert.alert('Изменение пароля', 'Ваш аккаунт использует автоматически генерированный пароль', [
                 {text: 'Изменить', onPress: () => navigation.navigate('ChangePassword', {recoveryMode: false})},
                 {text: 'Позже'},
@@ -78,20 +78,22 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
         <Preloader/>
         :
         <ScrollView style={styles.container}>
-            <View>
-                <Avatar editMode={editMode} source={profile?.avatar} file={file} setFile={setFile}/>
+            {profile &&
+                <View>
+                    <Avatar editMode={editMode} source={profile?.avatar} file={file} setFile={setFile}/>
 
-                <ProfileForm
-                    firstName={profile?.firstName || ''}
-                    lastName={profile?.lastName || ''}
-                    email={profile?.email || ''}
-                    phoneNumber={profile?.phoneNumber || ''}
-                    phonePublicity={profile?.phonePublicity || true}
-                    editMode={editMode}
-                    disableEditMode={() => setEditMode(false)}
-                    saveAvatar={saveAvatar}
-                />
-            </View>
+                    <ProfileForm
+                        firstName={profile?.firstName || ''}
+                        lastName={profile?.lastName || ''}
+                        email={profile?.email || ''}
+                        phoneNumber={profile?.phoneNumber || ''}
+                        phonePublicity={profile?.phonePublicity || true}
+                        editMode={editMode}
+                        disableEditMode={() => setEditMode(false)}
+                        saveAvatar={saveAvatar}
+                    />
+                </View>
+            }
         </ScrollView>
 }
 

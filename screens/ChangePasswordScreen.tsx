@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Alert, Button, StyleSheet, Text, View} from 'react-native'
 import {changeScreenStyles, screenStyles} from '../styles/common'
 import {NavigationProps, ScreenProps} from '../types/screens'
@@ -6,12 +6,13 @@ import PasswordStrengthValidator, {PasswordStrength} from '../components/Auth/Pa
 import {useDispatch, useSelector} from 'react-redux'
 import {changePassword, setPassword} from '../store/profile/profile-thunks'
 import FormikField from '../components/common/FormikField'
-import {selectProfileErrors} from '../store/profile/profile-selectors'
-import {errorAppeared} from '../store/profile/profile-actions'
+import {selectProfileErrors, selectProfileNavigation} from '../store/profile/profile-selectors'
+import {errorAppeared, passwordChanged} from '../store/profile/profile-actions'
 import {useNavigation} from '@react-navigation/native'
 
 const ChangePasswordScreen: React.FC<ScreenProps<'ChangePassword'>> = (props) => {
     const recoveryMode = props.route.params.recoveryMode
+    const email = props.route.params.email
 
     const dispatch = useDispatch()
     const navigation = useNavigation<NavigationProps>()
@@ -23,20 +24,29 @@ const ChangePasswordScreen: React.FC<ScreenProps<'ChangePassword'>> = (props) =>
     const [error, setError] = useState('')
 
     const profileErrors = useSelector(selectProfileErrors)
+    const profileNavigation = useSelector(selectProfileNavigation)
 
-    const change = (newPassword: string, oldPassword: string) => {
+    useEffect(() => {
+        if (profileNavigation.passwordChanged) {
+            recoveryMode ? navigation.navigate('Auth') : navigation.navigate('Profile')
+
+            dispatch(passwordChanged(false))
+
+            Alert.alert('Пароль изменен')
+        }
+    }, [profileNavigation])
+
+    const change = (newPassword: string, oldPassword?: string) => {
         if (!recoveryMode && oldPassword) {
             dispatch(changePassword(oldPassword, newPassword))
-            navigation.navigate('Profile')
         }
-        if (recoveryMode) {
-            dispatch(setPassword(newPassword))
-            navigation.navigate('Profile')
+        if (recoveryMode && email) {
+            dispatch(setPassword(newPassword, email))
         }
     }
 
     const onSubmit = () => {
-        if (newPassword && newPassword) {
+        if (newPassword) {
             if (newPassword !== repeatedPassword) {
                 setError('Пароли не совпадают')
                 return
@@ -44,11 +54,11 @@ const ChangePasswordScreen: React.FC<ScreenProps<'ChangePassword'>> = (props) =>
 
             if (passwordStrength === 'week') {
                 Alert.alert('Новый пароль слишком слабый', 'Использовать этот пароль?', [
-                    {text: 'OK', onPress: () => change(oldPassword, newPassword)},
+                    {text: 'OK', onPress: () => change(newPassword, oldPassword)},
                     {text: 'Отмена'},
                 ])
             } else {
-                change(oldPassword, newPassword)
+                change(newPassword, oldPassword)
             }
         }
     }

@@ -4,6 +4,7 @@ import {IArticlePreview, IFile} from '../../types/entities'
 import MessageAttachments from './MessageAttachments'
 import {MessagePreloader} from '../common/Preloader'
 import {getPrintTimeFormat} from '../../utilits/format-date'
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
 
 type Props = {
     text: string
@@ -12,6 +13,7 @@ type Props = {
     articles: IArticlePreview[]
     sentByCurrentUser: boolean
     inSending: boolean
+    isError: boolean
     change(): void
 }
 
@@ -32,7 +34,13 @@ const Message: React.FC<Props> = (props) => {
     return <View
         style={props.sentByCurrentUser ? [styles.container, styles.currentUserMessageContainer] : styles.container}
     >
-        {(props.inSending && props.sentByCurrentUser) && <View style={styles.preloader}><MessagePreloader/></View>}
+        {props.sentByCurrentUser && props.inSending ?
+            <View style={styles.preloader}><MessagePreloader/></View>
+            :
+            props.isError && <View style={styles.preloader}>
+                <MaterialIcons name={'error'} color={'#f00'} size={16}/>
+            </View>
+        }
 
         <TouchableOpacity
             style={messageStyles}
@@ -40,7 +48,7 @@ const Message: React.FC<Props> = (props) => {
         >
             {!!props.text && <Text>{props.text}</Text>}
 
-            <MessageAttachments files={props.files} articles={props.articles}/>
+            <MessageAttachments files={props.files} articles={props.articles} onLongPress={change}/>
 
             <View style={dateContainerStyles}>
                 <Text style={dateTextStyles}>{getPrintTimeFormat(props.time)}</Text>

@@ -121,8 +121,6 @@ export const restorePassword = (email: string): Thunk => async (dispatch) => {
         if (e.message === ErrorMessages.noAccountWithThisEmail) {
             dispatch(errorAppeared('Аккаунта с таким email не существует', 'email'))
         }
-
-        await handleTokenExpired(e, () => dispatch(restorePassword(email)))
     }
 }
 
@@ -137,19 +135,17 @@ export const sendPasswordCode = (code: string, email: string): Thunk => async (d
         if (e.message === ErrorMessages.invalidCode) {
             dispatch(errorAppeared('Неверный код', 'code'))
         }
-
-        await handleTokenExpired(e, () => dispatch(sendPasswordCode(code, email)))
     }
 }
 
-export const setPassword = (password: string): Thunk => async (dispatch) => {
+export const setPassword = (password: string, email: string): Thunk => async (dispatch) => {
     try {
-        await profileApi.setNewPassword(password)
+        await profileApi.setNewPassword(password, email)
 
         dispatch(passwordChanged(true))
     } catch (e) {
         console.error('set new password', e)
 
-        await handleTokenExpired(e, () => dispatch(setPassword(password)))
+        await handleTokenExpired(e, () => dispatch(setPassword(password, email)))
     }
 }

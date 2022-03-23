@@ -10,7 +10,7 @@ import {changeEmail, restorePassword} from '../store/profile/profile-thunks'
 import {useDispatch, useSelector} from 'react-redux'
 import {useNavigation} from '@react-navigation/native'
 import {selectProfileErrors, selectProfileNavigation} from '../store/profile/profile-selectors'
-import {errorAppeared} from '../store/profile/profile-actions'
+import {errorAppeared, passwordCodeSent} from '../store/profile/profile-actions'
 
 const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -32,6 +32,7 @@ const ForgotPasswordScreen: React.FC<ScreenProps<'ForgotPassword'>> = (props) =>
     useEffect(() => {
         if (profileNavigation.passwordCodeSent) {
             navigation.navigate('Verification', {email, type: 'RESTORE_PASSWORD'})
+            dispatch(passwordCodeSent(false))
         }
     })
 

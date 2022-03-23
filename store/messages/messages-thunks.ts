@@ -2,13 +2,13 @@ import {Thunk} from './messages-reducer'
 import websocketApi from '../../api/websocket-api'
 import {IArticlePreview, IFile, IMessage} from '../../types/entities'
 import {
-    fetchingChanged,
+    fetchingChanged, messageArticleEdited,
     messageDeleted,
     messageEdited,
     messageReceived,
     messageSendingStateChanged,
     messageSent,
-    messagesReceived
+    messagesReceived, sendingErrorAppeared
 } from './messages-actions'
 import messagesApi from '../../api/messages-api'
 import {Dispatch} from 'redux'
@@ -54,16 +54,20 @@ export const startMessagesListening = (): Thunk => async (dispatch) => {
 }
 
 export const sendMessage = (message: string, chatId: number, userId: number, files: IFile[], articles: IArticlePreview[]): Thunk =>
-    async (dispatch) => {
+    async (dispatch, getState) => {
         try {
-            const clientSideId = store.getState().messages.clientSideId
+            const clientSideId = getState().messages.clientSideId
 
             const preloadFiles: IFile[] = []
 
             files.map(item => preloadFiles.push(item))
 
-            //TODO preview sent articles
-            const profile = store.getState().profile.profile
+            const profile = getState().profile.profile
+
+            const maxFileSize = files.reduce((prev, curr) => Math.max(prev, curr.fileSize || 0), 0) || 0
+
+            const showPreloaderTimeout = 2000 + (maxFileSize / 3000 + 1000) * files.length
+
             profile && dispatch(messageSent({
                 id: clientSideId,
                 text: message,
@@ -77,7 +81,15 @@ export const sendMessage = (message: string, chatId: number, userId: number, fil
                 date: new Date(),
                 files: preloadFiles,
                 articles,
-                inSending: true,
+                clientSideId: clientSideId,
+
+                showPreloaderTimer: setTimeout(() => {
+                    dispatch(messageSendingStateChanged(clientSideId, chatId, true))
+                }, showPreloaderTimeout),
+
+                sendingErrorTimer: setTimeout(() => {
+                    dispatch(sendingErrorAppeared(clientSideId, chatId))
+                }, showPreloaderTimeout * 20)
             }))
 
             const getFilesId = async () => {
@@ -99,6 +111,7 @@ export const sendMessage = (message: string, chatId: number, userId: number, fil
     }
 
 export const removeMessage = (id: number, chatId: number): Thunk => async (dispatch) => {
+    dispatch(messageSendingStateChanged(id, chatId, true))
     websocketApi.remove(id, chatId)
 }
 
@@ -143,4 +156,8 @@ export const getChatMessages = (chatId: number): Thunk => async (dispatch) => {
         console.error('get chat messages', e)
         await handleTokenExpired(e, () => dispatch(getChatMessages(chatId)))
     }
+}
+
+export const editMessagesArticle = (article: IArticlePreview): Thunk => async (dispatch) => {
+    dispatch(messageArticleEdited(article))
 }

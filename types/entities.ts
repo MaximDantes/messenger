@@ -40,6 +40,11 @@ export interface IMessage {
     }
     readonly inSending?: boolean
     readonly clientSideId?: number
+    readonly isError?: boolean
+
+    //TODO timeout type
+    readonly showPreloaderTimer?: any
+    readonly sendingErrorTimer?: any
 }
 
 export interface IProfile {
@@ -53,7 +58,7 @@ export interface IProfile {
     readonly year: number
     readonly phoneNumber: string
     readonly groupName: GroupName
-    readonly newAccount: boolean
+    readonly temporaryPassword: boolean
     readonly subjects: number[]
 }
 

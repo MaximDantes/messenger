@@ -1,32 +1,43 @@
 import React from 'react'
-import {ImageBackground, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import {isFileTypeImage} from '../../types/file-types'
 import File from '../common/File'
-import {IArticle, IArticlePreview, IFile} from '../../types/entities'
+import {IArticlePreview, IFile} from '../../types/entities'
 import ArticlePreview from '../Articles/ArticlePreview'
 
 type Props = {
     file?: IFile
     article?: IArticlePreview
     isSingle: boolean
+    onLongPress(): void
     showImages?(): void
 }
 
 const MessageAttachment: React.FC<Props> = (props) => {
-    const isImage = isFileTypeImage(props.file?.fileType)
+    const isImage = isFileTypeImage(props.file?.fileType || 'article')
 
     const itemStyle = props.isSingle ?
         isImage ? styles.singleImageContainer : styles.singleFileContainer : styles.container
 
     return <View style={itemStyle}>
         <View style={itemStyle}>
-            {props.file && <File
-                uri={props.file.file}
-                name={props.file.fileName}
-                onPress={isImage ? props.showImages : undefined}
-            />}
+            {props.file &&
+                <File
+                    uri={props.file.file}
+                    name={props.file.fileName}
+                    onPress={isImage ? props.showImages : undefined}
+                    onLongPress={props.onLongPress}
+                    increaseFont={!props.isSingle}
+                />
+            }
 
-            {props.article && <ArticlePreview articlePreview={props.article}/>}
+            {props.article &&
+                <ArticlePreview
+                    articlePreview={props.article}
+                    onLongPress={props.onLongPress}
+                    increaseFont={!props.isSingle}
+                />
+            }
         </View>
     </View>
 }
@@ -41,7 +52,7 @@ const styles = StyleSheet.create({
     },
 
     singleFileContainer: {
-        width: '100%',
+        width: 150,
         height: 150,
     },
 

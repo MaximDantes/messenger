@@ -12,9 +12,19 @@ export const headerStyles = StyleSheet.create({
         alignItems: 'center',
     },
 
+    stackIconsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginRight: -12,
+    },
+
     icon: {
         marginRight: 12,
     },
+
+    back: {
+        marginRight: 30,
+    }
 })
 
 export const changeScreenStyles = StyleSheet.create({

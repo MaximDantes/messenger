@@ -47,7 +47,7 @@ const MessageForm: React.FC<Props> = (props) => {
 
     const send = () => {
         if (!props.editedMessage) {
-            if (user && (message.trim() || files.length > 0)) {
+            if (user && (message.trim() || (files.length > 0 || sharedArticles.length > 0))) {
                 dispatch(sendMessage(message.trim(), props.chatId,
                     user.id, files, sharedArticles))
 

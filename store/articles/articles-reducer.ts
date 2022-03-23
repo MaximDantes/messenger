@@ -40,7 +40,9 @@ const articlesReducer = (state = initialState, action: Action): typeof initialSt
         case 'articles/ARTICLE_EDITED':
             return {
                 ...state,
-                articles: [...state.articles.filter(item => item.id !== action.payload.id), action.payload]
+                articles: [...state.articles.map(item => item.id !== action.payload.id ? item : action.payload)],
+                articlesPreviews: [...state.articlesPreviews.map(item => item.id !== action.payload.id
+                    ? item : {id: action.payload.id, title: action.payload.title})],
             }
 
         case 'articles/SHARED_ARTICLE_CHANGED':

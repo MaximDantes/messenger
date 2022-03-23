@@ -12,6 +12,7 @@ import {useNavigation} from '@react-navigation/native'
 import {NavigationProps, ScreenProps} from '../types/screens'
 import {IMessage} from '../types/entities'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 
 const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
     const chatId = props.route.params.id
@@ -33,7 +34,7 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
         if (remove) {
             navigation.setOptions({
                 headerRight: () => (
-                    <TouchableOpacity onPress={remove}>
+                    <TouchableOpacity onPress={remove} style={headerStyles.stackIconsContainer}>
                         <AntDesignIcon name={'delete'} color={'#0976FF'} size={22} style={headerStyles.icon}/>
                     </TouchableOpacity>
 
@@ -43,7 +44,13 @@ const MessagesScreen: React.FC<ScreenProps<'Messages'>> = (props) => {
             navigation.setOptions({
                 title: chat?.title || 'Сообщения',
 
-                headerRight: () => <View style={headerStyles.iconsContainer}>
+                headerLeft: () => (
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={headerStyles.back}>
+                        <MaterialIcon name={'arrow-back'} color={'#000'} size={22}/>
+                    </TouchableOpacity>
+                ),
+
+                headerRight: () => <View style={headerStyles.stackIconsContainer}>
                     <TouchableOpacity
                         onPress={() => chat && navigation.navigate('Members', {chatId: chat.id, chatName: chat.title})}
                     >

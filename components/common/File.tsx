@@ -6,6 +6,7 @@ import {getFileName, getFileType, isFileTypeImage, isFileTypeOpenable} from '../
 import {downloadFile} from '../../utilits/download-file'
 import {NavigationProps} from '../../types/screens'
 import {Animated} from 'react-native'
+import Download from './Download'
 
 
 type Props = {
@@ -13,7 +14,9 @@ type Props = {
     name?: string
     downloadingDisabled?: boolean
     showingDisabled?: boolean
+    increaseFont?: boolean
     onPress?(): void
+    onLongPress?(): void
 }
 
 const File: React.FC<Props> = (props) => {
@@ -23,6 +26,8 @@ const File: React.FC<Props> = (props) => {
 
     const navigator = useNavigation<NavigationProps>()
 
+    const [isDownloading, setIsDownloading] = useState(false)
+
     const onPress = async () => {
         if (isFileTypeOpenable(getFileType(props.uri))) {
             if (props.showingDisabled) return
@@ -31,12 +36,13 @@ const File: React.FC<Props> = (props) => {
         } else {
             if (props.downloadingDisabled) return
 
-            await downloadFile(props.uri)
+            setIsDownloading(true)
         }
     }
 
     return <TouchableOpacity
         onPress={props.onPress || onPress}
+        onLongPress={props.onLongPress}
         style={[styles.container, !isImage && styles.fileContainer]}
     >
         {isImage ?
@@ -44,7 +50,11 @@ const File: React.FC<Props> = (props) => {
             :
             <>
                 <FeatherIcon name={'file'} size={30} color={'#ffffff'}/>
-                <Text style={styles.text}>{newFileName}</Text>
+                <Text style={[styles.text, props.increaseFont && styles.increasedFont]}>
+                    {newFileName}
+                </Text>
+
+                <Download uri={props.uri} isDownloading={isDownloading}/>
             </>}
     </TouchableOpacity>
 }
@@ -73,7 +83,11 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
-    }
+    },
+
+    increasedFont: {
+        fontSize: 16,
+    },
 })
 
 export default File

@@ -9,7 +9,7 @@ import {useNavigation} from '@react-navigation/native'
 import {Formik} from 'formik'
 import FormikField from '../components/common/FormikField'
 import * as Yup from 'yup'
-import {errorAppeared} from '../store/profile/profile-actions'
+import {codeConfirmed, errorAppeared} from '../store/profile/profile-actions'
 
 const validationSchema = Yup.object().shape({
     code: Yup.number()
@@ -33,8 +33,9 @@ const VerificationScreen: React.FC<ScreenProps<'Verification'>> = (props) => {
                 Alert.alert('Email изменен', '', [{text: 'OK'}])
             }
             if (type === 'RESTORE_PASSWORD') {
-                navigation.navigate('ChangePassword', {recoveryMode: true})
+                navigation.navigate('ChangePassword', {recoveryMode: true, email})
             }
+            dispatch(codeConfirmed(false))
         }
     })
 

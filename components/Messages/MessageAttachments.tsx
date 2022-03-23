@@ -1,15 +1,15 @@
-import {StyleSheet, Text, View} from 'react-native'
+import {StyleSheet, View} from 'react-native'
 import {IArticlePreview, IFile} from '../../types/entities'
 import React from 'react'
 import {isFileTypeImage} from '../../types/file-types'
-import MessageFile from './MessageAttachment'
+import MessageAttachment from './MessageAttachment'
 import {useNavigation} from '@react-navigation/native'
 import {NavigationProps} from '../../types/screens'
-import ArticlePreview from '../Articles/ArticlePreview'
 
 type Props = {
     files: IFile[]
     articles: IArticlePreview[]
+    onLongPress(): void
 }
 
 const MessageAttachments: React.FC<Props> = (props) => {
@@ -31,20 +31,22 @@ const MessageAttachments: React.FC<Props> = (props) => {
 
             const fileIndex = imagesIndex
 
-            return <MessageFile
+            return <MessageAttachment
                 key={item.id || item.file + index}
                 file={item}
-                isSingle={props.files.length === 1}
+                isSingle={props.files.length + props.articles.length === 1}
                 showImages={() => showImages(fileIndex)}
+                onLongPress={props.onLongPress}
             />
         })
 
 
         const articles = props.articles.map(item => (
-            <MessageFile
+            <MessageAttachment
                 key={item.id}
                 article={item}
-                isSingle={props.files.length === 1}
+                isSingle={props.files.length + props.articles.length === 1}
+                onLongPress={props.onLongPress}
             />
         ))
 
@@ -58,7 +60,6 @@ const MessageAttachments: React.FC<Props> = (props) => {
 
 const styles = StyleSheet.create({
     container: {
-        // width: '100%',
         flexDirection: 'row',
         flexWrap: 'wrap',
         flexShrink: 1,

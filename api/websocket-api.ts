@@ -41,10 +41,15 @@ class WebSocketApi {
 
     set token(value: string) {
         this._token = value
+        this.createChannel()
     }
 
     set onClose(callback: () => void) {
         this.onCloseCallback = callback
+    }
+
+    close() {
+        this.ws?.close()
     }
 
     subscribeOnSend(callback: SendSubscriber) {

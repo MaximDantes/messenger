@@ -13,7 +13,6 @@ import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIc
 import AntDesignIcon from 'react-native-vector-icons/AntDesign'
 import Files from '../components/common/Files'
 import {Preloader} from '../components/common/Preloader'
-import {IArticle} from '../types/entities'
 
 const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
     const articlePreview = props.route.params.articlePreview
@@ -34,9 +33,8 @@ const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
     const removeFromSharing = () => {
         dispatch(removeArticleFromSharing(articlePreview.id))
 
-        //TODO russian
         //TODO another showing
-        Alert.alert('Removed from sharing')
+        Alert.alert('Откреплено')
     }
 
     const edit = () => {
@@ -64,7 +62,7 @@ const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
     }
 
     const createHeaderIcons = () => (
-        <View style={headerStyles.iconsContainer}>
+        <View style={headerStyles.stackIconsContainer}>
             {(article?.teacher && profile?.id === article?.teacher) && <>
                 <TouchableOpacity onPress={remove}>
                     <AntDesignIcon name={'delete'} color={'#0976FF'} size={22} style={headerStyles.icon}/>
@@ -91,11 +89,11 @@ const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
         !article && dispatch(getArticle(articlePreview.id))
 
         navigation.setOptions({
-            title: articlePreview.title,
+            title: article?.title || articlePreview.title,
 
             headerRight: createHeaderIcons
         })
-    }, [articlePreview])
+    }, [articlePreview, article])
 
     useEffect(() => {
         navigation.setOptions({
@@ -112,7 +110,7 @@ const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
                 ?
                 <>
                     <View style={styles.textContainer}>
-                        <Text>{article.text}</Text>
+                        <Text style={styles.text}>{article.text}</Text>
                     </View>
 
                     <View style={styles.filesContainer}>
@@ -136,6 +134,10 @@ const styles = StyleSheet.create({
 
     textContainer: {
         padding: 5,
+    },
+
+    text: {
+        fontSize: 16,
     },
 
     filesContainer: {

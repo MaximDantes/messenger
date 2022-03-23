@@ -65,7 +65,6 @@ const ArticleFormScreen: React.FC<ScreenProps<'ArticleForm'>> = (props) => {
     }
 
     const edit = (values: { title: string, text: string }) => {
-        //TODO edit
         if (editedArticle) {
             dispatch(editArticle(editedArticle.id, values.title, values.text, files))
             navigation.goBack()

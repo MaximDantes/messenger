@@ -7,8 +7,6 @@ import {Platform} from 'react-native'
 
 export const downloadFile = async (uri: string) => {
     try {
-        //TODO download
-
         const targetUri = FileSystem.documentDirectory + getFileName(uri)
 
         const downloadedFile = await FileSystem.downloadAsync(uri, targetUri)

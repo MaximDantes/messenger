@@ -38,10 +38,10 @@ const LibraryArticlesScreen: React.FC<ScreenProps<'LibraryArticles'>> = (props) 
             title: subject.title,
         })
 
-        if (profile?.groupName === 'teacher' && profile.subjects.includes(subject.id)) {
+        if (profile?.groupName === 'teacher' && profile.subjects && profile.subjects.includes(subject.id)) {
             navigation.setOptions({
                 headerRight: () => (
-                    <View style={headerStyles.iconsContainer}>
+                    <View style={headerStyles.stackIconsContainer}>
                         <TouchableOpacity
                             onPress={() => navigation.navigate('ArticleForm', {year, specialityId, subjectId: subject.id})}
                         >

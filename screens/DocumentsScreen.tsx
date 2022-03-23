@@ -3,9 +3,12 @@ import React, {useEffect, useState} from 'react'
 import WebView from 'react-native-webview'
 import {getFileName, getFileType} from '../types/file-types'
 import {useNavigation} from '@react-navigation/native'
-import {downloadFile} from '../utilits/download-file'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import {NavigationProps, ScreenProps} from '../types/screens'
+import Download from '../components/common/Download'
+import {headerStyles} from '../styles/common'
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
+
 
 const DocumentsScreen: React.FC<ScreenProps<'Documents'>> = (props) => {
     const uri = props.route.params.uri
@@ -19,11 +22,17 @@ const DocumentsScreen: React.FC<ScreenProps<'Documents'>> = (props) => {
         navigation.setOptions({
             title: name || getFileName(uri),
 
+            headerLeft: () => (
+                <TouchableOpacity onPress={() => navigation.goBack()} style={headerStyles.back}>
+                    <MaterialIcon name={'arrow-back'} color={'#000'} size={22}/>
+                </TouchableOpacity>
+            ),
+
             headerRight: () => (
                 <TouchableOpacity onPress={() => setIsDownloading(true)}>
                     <FeatherIcon name={'download'} color={'#2196F3'} size={22}/>
                 </TouchableOpacity>
-            )
+            ),
         })
     }, [uri, name])
 
@@ -48,15 +57,8 @@ const DocumentsScreen: React.FC<ScreenProps<'Documents'>> = (props) => {
                     startInLoadingState={true}
                     source={{uri: source}}
                 />
-                {isDownloading &&
-                    <View style={styles.download}>
-                        <WebView
-                            originWhitelist={['*']}
-                            startInLoadingState={true}
-                            source={{html: `<a href='${uri}' download/> <script>document.querySelector('a').click()</script>`}}
-                        />
-                    </View>
-                }
+
+                <Download uri={uri} isDownloading={isDownloading}/>
             </>
         }
     </View>
@@ -69,12 +71,6 @@ const styles = StyleSheet.create({
 
     iframe: {
         height: '100%'
-    },
-
-    download: {
-        overflow: 'hidden',
-        maxWidth: 0,
-        maxHeight: 0,
     },
 })
 

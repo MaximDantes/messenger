@@ -12,15 +12,15 @@ const PasswordStrengthValidator: React.FC<Props> = (props) => {
 
     useEffect(() => {
         if (regex.securePassword.test(props.password)) {
-            setPasswordStrength('secure')
+            passwordStrength !== 'secure' && setPasswordStrength('secure')
             props.setPasswordStrength?.('secure')
             return
         } else if (regex.mediumPassword.test(props.password)) {
-            setPasswordStrength('medium')
+            passwordStrength !== 'medium' && setPasswordStrength('medium')
             props.setPasswordStrength?.('medium')
             return
         } else {
-            setPasswordStrength('week')
+            passwordStrength !== 'week' && setPasswordStrength('week')
             props.setPasswordStrength?.('week')
         }
     }, [props.password])

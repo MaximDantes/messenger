@@ -15,6 +15,7 @@ import {
     selectProfileErrors,
     selectProfileNavigation
 } from '../store/profile/profile-selectors'
+import {emailForVerificationChanged} from '../store/profile/profile-actions'
 
 const validationSchema = Yup.object().shape({
     email: Yup.string()
@@ -34,6 +35,7 @@ const ChangeEmailScreen: React.FC<ScreenProps<'ChangeEmail'>> = () => {
     useEffect(() => {
         if (profileNavigation.emailCodeSent) {
             navigation.navigate('Verification', {email: emailForVerification, type: 'CHANGE_EMAIL'})
+            dispatch(emailForVerificationChanged(''))
         }
     })
 
