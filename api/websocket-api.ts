@@ -76,7 +76,7 @@ class WebSocketApi {
         this.editSubscribers.push(callback)
     }
 
-    send(message: string, chatId: number, clientSideId: number, files: string[], articles: number[]) {
+    send(message: string, chatId: number, clientSideId: number, files: number[], articles: number[]) {
         this.ws?.send(JSON.stringify({
             message: {
                 text: message,
@@ -99,7 +99,7 @@ class WebSocketApi {
         }))
     }
 
-    edit(id: number, message: string, chatId: number, files: string[], articles: number[]) {
+    edit(id: number, message: string, chatId: number, files: number[], articles: number[]) {
         this.ws?.send(JSON.stringify({
             message: {
                 message_id: id,

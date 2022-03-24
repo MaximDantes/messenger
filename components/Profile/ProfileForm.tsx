@@ -41,7 +41,7 @@ const ProfileForm: React.FC<Props> = (props) => {
     const navigation = useNavigation<NavigationProps>()
     const dispatch = useDispatch()
 
-    const [isChecked, setIsChecked] = useState(false)
+    const [isChecked, setIsChecked] = useState(!props.phonePublicity)
 
     useEffect(() => {
         setIsChecked(!props.phonePublicity)

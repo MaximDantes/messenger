@@ -114,11 +114,7 @@ const ArticleScreen: React.FC<ScreenProps<'Article'>> = (props) => {
                     </View>
 
                     <View style={styles.filesContainer}>
-                        <Files
-                            files={article.files}
-                            downloadingDisabled={true}
-                            showingDisabled={true}
-                        />
+                        <Files files={article.files}/>
                     </View>
                 </>
                 :

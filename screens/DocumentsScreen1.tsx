@@ -1,7 +1,7 @@
-import {Platform, StyleSheet, TouchableOpacity, View, Text, Alert} from 'react-native'
+import {Platform, StyleSheet, TouchableOpacity, View, Button} from 'react-native'
 import React, {useEffect, useState} from 'react'
 import WebView from 'react-native-webview'
-import {getFileName, getFileType} from '../types/file-types'
+import {getFileName, getFileType, isFileTypeOpenable} from '../types/file-types'
 import {useNavigation} from '@react-navigation/native'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import {NavigationProps, ScreenProps} from '../types/screens'
@@ -39,54 +39,39 @@ const DocumentsScreen: React.FC<ScreenProps<'Documents'>> = (props) => {
         })
     }, [uri, name])
 
+    const fileType = getFileType(uri)
+    const isFileOpenable = isFileTypeOpenable(fileType)
+
     let source
-    switch (getFileType(uri)) {
-        case 'pdf':
+    switch (fileType) {
+        case 'pfd':
             source = `https://docs.google.com/gview?embedded=true&url=${uri}`
             break
 
-        case 'pptx':
-            source = `https://drive.google.com/viewerng/viewer?embedded=true&url=${uri}`
-            break
-
-        case 'docx':
-            source = `https://drive.google.com/viewerng/viewer?embedded=true&url=${uri}`
-            break
-
         default:
-            source = ''
+            source = `https://drive.google.com/viewerng/viewer?embedded=true&url=${uri}`
     }
 
-    useEffect(() => {
-        if (!source) {
-            Alert.alert('Данный формат файлов не поддерживается')
-        }
-    }, [uri])
-
     return <View style={styles.container}>
-        {Platform.OS === 'web'
+        {!isFileOpenable
             ?
-            <iframe src={source} style={styles.iframe}/>
+            <Button title={'Скачать'} onPress={() => setIsDownloading(true)}/>
             :
-            <>
                 <WebView
                     style={styles.container}
                     startInLoadingState={true}
                     source={{uri: source}}
                 />
+            }
 
-                <Download uri={uri} isDownloading={isDownloading}/>
-            </>
-        }
+        <Download uri={uri} isDownloading={isDownloading}/>
     </View>
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-    },
-
-    viewContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
         flex: 1,
     },
 

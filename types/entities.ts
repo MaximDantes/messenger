@@ -54,7 +54,10 @@ export interface IProfile {
     readonly avatar: string
     readonly phonePublicity: boolean
     readonly email: string
-    readonly speciality: number
+    readonly speciality: {
+        id: number
+        title: string
+    }
     readonly year: number
     readonly phoneNumber: string
     readonly groupName: GroupName

@@ -112,6 +112,10 @@ const profileReducer = (state = initialState, action: Action): typeof initialSta
         case 'profile/PASSWORD_CHANGED':
             return {
                 ...state,
+                profile: {
+                    ...state.profile,
+                    temporaryPassword: false,
+                },
                 navigation: {
                     ...state.navigation,
                     passwordChanged: action.payload

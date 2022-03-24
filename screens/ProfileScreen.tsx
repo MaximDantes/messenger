@@ -20,6 +20,7 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
 
     const isFetching = useSelector(selectProfileFetching)
     const profile = useSelector(selectProfile)
+    console.log(profile)
 
     const showLogoutModal = () => {
         if (Platform.OS === 'web') {
@@ -87,7 +88,7 @@ const ProfileScreen: React.FC<ScreenProps<'Profile'>> = () => {
                         lastName={profile?.lastName || ''}
                         email={profile?.email || ''}
                         phoneNumber={profile?.phoneNumber || ''}
-                        phonePublicity={profile?.phonePublicity || true}
+                        phonePublicity={profile?.phonePublicity}
                         editMode={editMode}
                         disableEditMode={() => setEditMode(false)}
                         saveAvatar={saveAvatar}

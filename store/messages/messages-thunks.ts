@@ -93,13 +93,13 @@ export const sendMessage = (message: string, chatId: number, userId: number, fil
             }))
 
             const getFilesId = async () => {
-                const requests: Promise<string>[] = []
+                const requests: Promise<number>[] = []
 
                 files.forEach(item => {
-                    requests.push(messagesApi.sendFile(chatId, item).then(response => String(response.id)))
+                    requests.push(messagesApi.sendFile(chatId, item).then(response => Number(response.id)))
                 })
 
-                return await Promise.all<string>(requests)
+                return await Promise.all<number>(requests)
             }
 
             const filesId = await getFilesId()
@@ -120,17 +120,17 @@ export const editMessage = (id: number, chatId: number, text: string, files: IFi
     dispatch(messageSendingStateChanged(id, chatId, true))
 
     const getFilesId = async () => {
-        const requests: Promise<string>[] = []
+        const requests: Promise<number>[] = []
 
         files.map(item => {
             if (!item.id) {
-                requests.push(messagesApi.sendFile(chatId, item).then(response => String(response.id)))
+                requests.push(messagesApi.sendFile(chatId, item).then(response => Number(response.id)))
             } else {
-                requests.push(new Promise((resolve) => resolve(String(item.id))))
+                requests.push(new Promise((resolve) => resolve(Number(item.id))))
             }
         })
 
-        return await Promise.all<string>(requests)
+        return await Promise.all<number>(requests)
     }
 
     const filesId = await getFilesId()

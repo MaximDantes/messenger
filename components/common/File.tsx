@@ -26,17 +26,11 @@ const File: React.FC<Props> = (props) => {
 
     const navigator = useNavigation<NavigationProps>()
 
-    const [isDownloading, setIsDownloading] = useState(false)
-
     const onPress = async () => {
-        if (isFileTypeOpenable(getFileType(props.uri))) {
-            if (props.showingDisabled) return
+        if (props.showingDisabled) return
 
+        if (!props.downloadingDisabled && !props.showingDisabled) {
             navigator.navigate('Documents', {uri: props.uri, name: props.name})
-        } else {
-            if (props.downloadingDisabled) return
-
-            setIsDownloading(true)
         }
     }
 
@@ -53,9 +47,8 @@ const File: React.FC<Props> = (props) => {
                 <Text style={[styles.text, props.increaseFont && styles.increasedFont]}>
                     {newFileName}
                 </Text>
-
-                <Download uri={props.uri} isDownloading={isDownloading}/>
-            </>}
+            </>
+        }
     </TouchableOpacity>
 }
 

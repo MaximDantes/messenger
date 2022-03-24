@@ -27,6 +27,9 @@ export const getFileType = (fileName: string): FileType => {
         case 'docx':
             return 'docx'
 
+        case 'pptx':
+            return 'pptx'
+
         default:
             return 'unknown'
     }

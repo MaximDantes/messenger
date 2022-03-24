@@ -79,6 +79,12 @@ const MessagesContainer: React.FC<Props> = (props) => {
         props.toggleChangeMode(message, () => onMessageRemove(message.id, props.chat.id))
     }
 
+    const onLayout = () => {
+        if (isScrollOnBottom.current) {
+            scrollView.current?.scrollToEnd({animated: false})
+        }
+    }
+
     return (isReceivingMessages && messages.length === 0) ?
         <Preloader/>
         :
@@ -90,7 +96,7 @@ const MessagesContainer: React.FC<Props> = (props) => {
             onScroll={setScrollPosition}
             scrollEventThrottle={50}
             onContentSizeChange={onContentSizeChange}
-            onLayout={() => scrollView.current?.scrollToEnd({animated: false})}
+            onLayout={onLayout}
         >
             {isReceivingMessages && <View style={styles.preloaderContainer}><MessagePreloader/></View>}
 

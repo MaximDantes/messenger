@@ -1,4 +1,4 @@
-import {Alert, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
+import {ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View} from 'react-native'
 import React, {useEffect, useState} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import * as DocumentPicker from 'expo-document-picker'
@@ -12,7 +12,6 @@ import {editMessage, sendMessage} from '../../store/messages/messages-thunks'
 import {NavigationProps} from '../../types/screens'
 import {IArticlePreview, IFile, IMessage} from '../../types/entities'
 import {selectSharedArticle} from '../../store/articles/articles-selectors'
-import ArticlePreview from '../Articles/ArticlePreview'
 import {clearSharing, removeArticleFromSharing} from '../../store/articles/articles-actions'
 
 type Props = {
@@ -56,9 +55,11 @@ const MessageForm: React.FC<Props> = (props) => {
                 setFiles([])
             }
         } else {
-            dispatch(editMessage(props.editedMessage.id, props.editedMessage.chatId, message, files, articles))
-            dispatch(clearSharing())
-            props.toggleEditMode()
+            if (user && (message.trim() || (files.length > 0 || articles.length > 0))) {
+                dispatch(editMessage(props.editedMessage.id, props.editedMessage.chatId, message, files, articles))
+                dispatch(clearSharing())
+                props.toggleEditMode()
+            }
         }
     }
 
